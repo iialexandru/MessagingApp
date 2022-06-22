@@ -1,7 +1,7 @@
-import gulp from 'gulp'
-import postcss from 'gulp-postcss'
-import autoprefixer from 'autoprefixer'
-import cssnano from 'cssnano'
+const gulp = require('gulp')
+const postcss = require('gulp-postcss')
+const autoprefixer = require('autoprefixer')
+const cssnano = require('cssnano')
 
 const sass = require('gulp-sass')(require('sass'))
 
@@ -11,14 +11,14 @@ gulp.task('sass', function() {
         cssnano
     ]
     return gulp
-        .src('./styles/scss/**/*.scss')
+        .src('./src/styles/scss/**/*.scss')
         .pipe(sass().on('error', sass.logError))
         .pipe(postcss(processors))
-        .pipe(gulp.dest('./styles/css'))
+        .pipe(gulp.dest('./src/styles/css'))
 })
 
 gulp.task('watch', function() {
-    gulp.watch('./styles/scss/**/*.scss', gulp.series('sass'))
+    gulp.watch('./src/styles/scss/**/*.scss', gulp.series('sass'))
 })
 
 gulp.task('default', gulp.series('sass', 'watch'))

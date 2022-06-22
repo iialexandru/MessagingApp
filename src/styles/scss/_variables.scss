@@ -1,0 +1,35 @@
+$cream: #D6BE9F;
+$light-cream: #ecba82;
+$green: #3c887e;
+$gray: #D6D6D6;
+
+@mixin Scrollbar {
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+      
+    &::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: rgb(180, 180, 180);
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    ::-webkit-scrollbar {
+        height: 7px;
+      }
+      
+    ::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: rgb(230, 230, 230);
+        border-radius: 5px;
+        cursor: pointer;
+    }
+}

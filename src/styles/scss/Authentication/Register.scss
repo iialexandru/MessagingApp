@@ -1,0 +1,66 @@
+@import '../variables';
+@import './basics';
+
+@include Content;
+
+.container {
+    gap: 1em;
+    padding-inline: min(5vw, 50px);
+    background-color: #E9E9E9;
+}
+
+.textfield_box {
+    margin-top: 20px;
+}
+
+.action {
+    color: $green;
+    display: flex;
+    flex-flow: column wrap;
+    gap: 1em;
+    font-family: 'Inter', sans-serif;
+    margin-top: 20px;
+
+    button {
+        width: 100%;
+        padding-block: .3em;
+        font-family: 'Baloo Bhai 2', cursive;
+        font-weight: 800;
+        font-size: 1.4rem;
+        border-radius: 10px;
+        background-color: $cream;
+        border: 0;
+        cursor: pointer;
+        color: #E9E9E9;
+
+        &:hover {
+            opacity: .9;
+        }
+
+        &:active {
+            opacity: .8;
+        }
+    }
+
+    a {
+        font-size: .85rem;
+        text-align: right;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.container_code {
+    h1 {
+        margin-inline: auto;
+    }
+}
+
+.info {
+    font-family: 'Baloo Bhai 2', cursive;
+    text-align: center;
+    opacity: .5;
+    margin-top: -20px;
+}
