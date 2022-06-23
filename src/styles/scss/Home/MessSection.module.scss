@@ -1,0 +1,44 @@
+@import '../variables';
+
+.section {
+    height: 90px;
+    border-bottom: 1px solid $gray;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding-inline: 10px 3px;
+    gap: 1em;
+    transition: all .35s;
+    cursor: pointer;
+    max-width: 320px;
+
+    &:hover {
+        background-color: rgb(220, 220, 220);
+    }
+}
+
+.info {
+    display: flex;
+    flex-flow: column wrap;
+    gap: .6em;
+    overflow: hidden;
+
+    span[id='name'] {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-family: 'Baloo Bhai 2', cursive;
+        font-weight: bold;
+        font-size: 1.3rem;
+        width: 240px;
+    }
+
+    span[id='message'] {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-family: sans-serif;
+        color: rgb(200, 200, 200);
+        width: 240px;
+    }
+}

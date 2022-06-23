@@ -1,0 +1,40 @@
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('https://res.cloudinary.com/multimediarog/image/upload/v1655894930/MessagingApp/v748-toon-111_zprbkh.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.flex_error {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Oxygen Mono', monospace;
+    gap: 2em;
+
+    img {
+        width: min(80vw, 400px);
+        height: min(40vh, 400px);
+    }
+}
+
+.info {
+    width: 40%;
+
+    h1 {
+        font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    .info {
+        width: 80%;
+    }
+}
