@@ -1,0 +1,11 @@
+@mixin Container {
+    .container {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-end;
+        height: calc(100% - 90px);
+        gap: 1em;
+        padding-top: 20px;
+        padding-inline: 30px;
+    }
+}

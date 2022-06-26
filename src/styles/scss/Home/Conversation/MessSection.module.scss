@@ -1,4 +1,4 @@
-@import '../variables';
+@import '../../variables';
 
 .section {
     height: 90px;
@@ -15,6 +15,10 @@
     &:hover {
         background-color: rgb(220, 220, 220);
     }
+}
+
+.active_profile {
+    background-color: rgb(220, 220, 220);
 }
 
 .info {

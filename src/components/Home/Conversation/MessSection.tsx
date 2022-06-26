@@ -1,12 +1,19 @@
-import type { FC } from 'react';
+import type { FC, Dispatch, SetStateAction } from 'react';
 
-import styles from '../../styles/scss/Home/MessSection.module.scss';
+import styles from '../../../styles/scss/Home/Conversation/MessSection.module.scss';
+
+import { Section } from '@typings'
 
 
-const MessSection = () => {
+interface Props {
+    setSection: Dispatch<SetStateAction<Section>>;
+}
+
+
+const MessSection: FC<Props> = ({ setSection }) => {
 
     return (
-        <div className={styles.section}>
+        <div onClick={() => setSection('Messages')} className={styles.section}>
             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655985701/MessagingApp/man_5-512_esb1fi.webp' width={40} height={40} alt='Friend' />
 
             <div className={styles.info}>

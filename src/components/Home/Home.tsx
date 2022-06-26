@@ -1,10 +1,13 @@
 import { useState } from 'react'
 
 import styles from '../../styles/scss/Home/Home.module.scss';
-import MessSection from './MessSection'
+import MessSection from './Conversation/MessSection'
 import Toolbar from './Toolbar'
+import MessageContainer from './Conversation/MessageContainer'
+import SocialContainer from './Social/SocialContainer'
 
-type Section = 'Messages' | 'Friends' | 'Profile' | 'None'
+import { Section } from '@typings'
+
 
 const Home = () => {
     const [ section, setSection ] = useState<Section>('None')
@@ -22,15 +25,17 @@ const Home = () => {
                     </div>
 
                     <div className={styles.section_container}>
-                        <MessSection />
-                        <MessSection />
-                        <MessSection />
-                        <MessSection />
+                        <MessSection setSection={setSection} />
+                        <MessSection setSection={setSection} />
+                        <MessSection setSection={setSection} />
+                        <MessSection setSection={setSection} />
                     </div>
                 </div>
 
                 <div className={styles.replacer}>
                     <Toolbar setSection={setSection} section={section} />
+                    {section === 'Messages' && <MessageContainer /> }
+                    {section === 'Social' && <SocialContainer /> }
                 </div>
             </div>
         </div>

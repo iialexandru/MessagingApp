@@ -63,4 +63,6 @@
 .replacer {
     width: 60vw;
     height: 100%;
+    display: flex;
+    flex-flow: column wrap;
 }

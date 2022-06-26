@@ -17,6 +17,7 @@
     "autoprefixer": "^10.4.7",
     "axios": "^0.27.2",
     "cssnano": "^5.1.12",
+    "date-fns": "^2.28.0",
     "gulp": "^4.0.2",
     "gulp-postcss": "^9.0.1",
     "gulp-sass": "^5.1.0",
@@ -56,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "@types/date-fns": "^2.6.0",
     "@types/gulp": "^4.0.9",
     "@types/gulp-postcss": "^8.0.2",
     "@types/js-cookie": "^3.0.2",
