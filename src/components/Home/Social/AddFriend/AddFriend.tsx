@@ -11,7 +11,7 @@ const AddFriend = () => {
         <div className={styles.friends_container}>
             <input value={search} onChange={e => setSearch(e.target.value)} />
             {/* <div className={styles.values}>
-                <SearchItem email={'asda'} />
+                <SearchItem email={'asda'} name={'asudiahsd'} />
             </div> */}
             <div className={styles.none}>
                 <h2>No results found</h2>

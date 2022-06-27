@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
+import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import Login from './components/Authentication/Login'
@@ -17,6 +17,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
+          <Route path='/' element={<Navigate to='/home' replace={true} />} />
           <Route path='/authentication/login' element={<Login />} />
           <Route path='/authentication/register' element={<Register />} />
           <Route path='/authentication/forgot-password/:unique_url' element={<ForgotPasswordComplete />} />
