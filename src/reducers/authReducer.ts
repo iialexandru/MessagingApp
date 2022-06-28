@@ -1,108 +1,175 @@
-import axios from 'axios'
-import { server } from '../config/index'
-
 const INITIAL_STATE = {
     loggedIn: false,
     loading: false,
     errors: {
         email: '',
         password: '',
+        confirmPassword: '',
         username: '',
-        fullError: ''
-    },
-}
-
-export const LOG_IN_START = 'LOG_IN_START'
-export const LOG_IN_END = 'LOG_IN_END'
-export const LOG_IN_FAIL = 'LOG_IN_FAIL'
-export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'
-
-export const AUTH_ACTIONS = {
-    LOG_IN_START,
-    LOG_IN_END,
-    LOG_IN_FAIL,
-    LOG_IN_SUCCESS
-}
-
-export const login = ({ email, password }: { email: string, password: string }) => async (dispatch: any) => {
-    dispatch({
-        type: LOG_IN_START,
-        payload: { loading: true }
-    })
-
-    const data = { email, password }
-
-    try {
-        const result = (await axios.post(`${server}/api/authentication/login`, data, { withCredentials: true })).data
-
-        dispatch({
-            type: LOG_IN_SUCCESS,
-            payload: { loading: false, loggedIn: true }
-        })
-
-        dispatch({
-            type: LOG_IN_END,
-            payload: { loading: false }
-        })
-    } catch (err: any) {
-        if(err && err.response && err.response.data.type && err.response.data.type === 'email') {
-            dispatch({
-                type: LOG_IN_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'email' }
-            })
-        } else if(err && err.response && err.response.data.type && err.response.data.type === 'password') {
-            dispatch({
-                type: LOG_IN_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'password' }
-            })
-        } else if(err && err.response && err.response.data.type && err.response.data.type === 'both') {
-            dispatch({
-                type: LOG_IN_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'both' }
-            })
-        } else {
-            dispatch({
-                type: LOG_IN_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'fullError' }
-            })
-        }
+        fullError: '',
+        code: ''
     }
+}
 
-    dispatch({
-        type: LOG_IN_END,
-        payload: { loading: false }
-    })
+
+export enum AUTH_ACTIONS {
+    LOGGED_IN = 'LOGGED_IN',
+    NOT_LOGGED_IN = 'NOT_LOGGED_IN',
+    DEFAULT_STATE = 'DEFAULT_STATE',
+    START_LOADING = 'START_LOADING',
+    STOP_LOADING = 'STOP_LOADING',
+    LOG_IN_FAIL = 'LOG_IN_FAIL',
+    LOG_IN_SUCCESS = 'LOG_IN_SUCCESS',
+    REGISTER_START = 'REGISTER_START',
+    REGISTER_END = 'REGISTER_END',
+    REGISTER_FAIL = 'REGISTER_FAIL',
+    REGISTER_SUCCESS = 'REGISTER_SUCCESS',
+    CODE_REGISTER_START = 'CODE_REGISTER_START',
+    CODE_REGISTER_END = 'CODE_REGISTER_END',
+    CODE_REGISTER_FAIL = 'CODE_REGISTER_FAIL',
+    CODE_REGISTER_SUCCESS = 'CODE_REGISTER_SUCCESS',
+    FP_START = 'FP_START',
+    FP_END = 'FP_END',
+    FP_FAIL = 'FP_FAIL',
+    FP_SUCCESS = 'FP_SUCCESS',
 }
 
 const reducer = (state = INITIAL_STATE, action: any) => {
     switch(action.type) {
-        case LOG_IN_START: {
+        case AUTH_ACTIONS.LOGGED_IN: {
             return {
                 ...state,
-                loading: action.payload.loading
+                loggedIn: true
             }
         }
-        case LOG_IN_END: {
+        case AUTH_ACTIONS.NOT_LOGGED_IN: {
             return {
                 ...state,
-                loading: action.payload.loading
+                loggedIn: false
             }
         }
-        case LOG_IN_FAIL: {
+        case AUTH_ACTIONS.START_LOADING: {
             return {
                 ...state,
-                loading: action.payload.loading,
-                loggedIn: action.payload.loggedIn,
+                loading: true
+            }
+        }
+        case AUTH_ACTIONS.STOP_LOADING: {
+            return {
+                ...state,
+                loading: false
+            }
+        }
+        case AUTH_ACTIONS.DEFAULT_STATE: {
+            return {
+                ...state,
+                errors: {
+                    email: '',
+                    password: '',
+                    username: '',
+                    fullError: '',
+                    code: ''
+                },
+                loading: false
+            }
+        }
+        case AUTH_ACTIONS.LOG_IN_FAIL: {
+            return {
+                ...state,
+                loading: false,
+                loggedIn: false,
                 errors: {
                     [ action.payload.name ]: action.payload.error
                 }
             }
         }
-        case LOG_IN_SUCCESS: {
+        case AUTH_ACTIONS.LOG_IN_SUCCESS: {
             return {
                 ...state,
-                loading: action.payload.loading,
-                loggedIn: action.payload.loggedIn
+                loading: false,
+                loggedIn: true
+            }
+        }
+        case AUTH_ACTIONS.REGISTER_START: {
+            return {
+                ...state,
+                loading: true,
+            }
+        }
+        case AUTH_ACTIONS.REGISTER_END: {
+            return {
+                ...state,
+                loading: false
+            }
+        }
+        case AUTH_ACTIONS.REGISTER_FAIL: {
+            return {
+                ...state,
+                loading: false,
+                loggedIn: false,
+                errors: {
+                    [ action.payload.name ]: action.payload.error
+                }
+            }
+        }
+        case AUTH_ACTIONS.REGISTER_SUCCESS: {
+            return {
+                ...state,
+                loading: false
+            }
+        }
+        case AUTH_ACTIONS.CODE_REGISTER_START: {
+            return {
+                ...state,
+                loading: true
+            }
+        }
+        case AUTH_ACTIONS.CODE_REGISTER_END: {
+            return {
+                ...state,
+                loading: false
+            }
+        }
+        case AUTH_ACTIONS.CODE_REGISTER_FAIL: {
+            return {
+                ...state,
+                loading: false,
+                loggedIn: false,
+                errors: {
+                    [ action.payload.name ]: action.payload.error
+                }
+            }
+        }
+        case AUTH_ACTIONS.CODE_REGISTER_SUCCESS: {
+            return {
+                ...state,
+                loading: false,
+                loggedIn: true
+            }
+        }
+        case AUTH_ACTIONS.FP_START: {
+            return {
+                ...state,
+                loading: true
+            }
+        }
+        case AUTH_ACTIONS.FP_END: {
+            return {
+                ...state,
+                loading: false
+            }
+        }
+        case AUTH_ACTIONS.FP_FAIL: {
+            return {
+                ...state,
+                loading: false,
+                [ action.payload.name ]: action.payload.error
+            }
+        }
+        case AUTH_ACTIONS.FP_SUCCESS: {
+            return {
+                ...state,
+                loading: false
             }
         }
         default: {

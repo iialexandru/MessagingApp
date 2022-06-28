@@ -1,51 +1,41 @@
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { connect } from 'react-redux'
 
 import styles from '../../styles/scss/Authentication/ForgotPassword.module.scss'
-import { server } from '../../config/index'
+import useFormHandler from '../../hooks/FormHandler'
+import { forgotPassword, defaultState } from '../../actions/authActions'
 
 
-const Login = () => {
+const Login = ({ loggedIn, loading, serverErrors, forgotPassword, defaultState }: { loggedIn: boolean, loading: boolean, serverErrors: any, forgotPassword: any, defaultState: any }) => {
     const navigate = useNavigate()
 
-    const [ email, setEmail ] = useState('')
-    const [ loading, setLoading ] = useState(false)
     const [ sent, setSent ] = useState(false)
-    const [ error, setError ] = useState('')
 
-    
+    const { values, errors, setError, setField, verifyValidity } = useFormHandler({ email: '' }, serverErrors)
+
+
+    useEffect(() => {
+        defaultState()
+    }, [ defaultState ])
+
+
+    const onSuccess = () => {
+        setSent(true)
+    }
+
     const forgotPassRequest = async (e: any) => {
         e.preventDefault()
 
-        const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        setError('fullName', '')
 
-        setError(email.length > 500 ? 'Max 500 char...' : (!email.match(emailRegex) ? 'Invalid email...' : ''))
+        verifyValidity()
 
-        if(email.length > 500 || !email.match(emailRegex)) {
-            setLoading(false)
-            return;
-        }
+        if(errors?.email?.length > 0) return;
 
-        setLoading(true)
-
-        const result = await axios.post(`${server}/api/authentication/forgot-password`, { email }, { withCredentials: true })
-                                .then(res => res.data)
-                                .catch(err => {
-                                    if(err && err.response && err.response.data.message) {
-                                        setError(err.response.data.message)
-                                    }
-                                    setLoading(false)
-                                })
-        if(result && result.message) {
-            setLoading(false)
-            setSent(true)
-        } else {
-            setLoading(false)
-        }
-        setLoading(false)
+        forgotPassword({ email: values.email, onSuccess })
     }
     
     return (
@@ -62,12 +52,12 @@ const Login = () => {
                         <div className={styles.textfield_box}>
                             <TextField 
                                 placeholder='example@gmail.com' 
-                                value={email} 
-                                onChange={e => { setEmail(e.target.value); if(error.length > 0) { setError('') } } } 
+                                value={values.email} 
+                                onChange={e => { setField('email', e.target.value) } } 
                                 variant='standard'
-                                helperText={error}
+                                helperText={errors.email}
                                 autoComplete='email'
-                                className={error.length > 0 ? styles.error : ''}
+                                className={errors?.email?.length > 0 ? styles.error : ''}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment
@@ -118,4 +108,4 @@ const Login = () => {
     )
 }
 
-export default Login;
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors, loading: state.auth.loading }), { forgotPassword, defaultState })(Login);

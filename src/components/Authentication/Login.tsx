@@ -1,15 +1,12 @@
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import Cookies from 'js-cookie'
 import { connect } from 'react-redux'
 
 import styles from '../../styles/scss/Authentication/Login.module.scss'
-import { server, dev } from '../../config/index'
-import { login } from '../../reducers/authReducer'
-import FormHandler from '../../hoc/FormHandler'
+import { login, defaultState } from '../../actions/authActions'
+import useFormHandler from '../../hooks/FormHandler'
 
 interface Props {
     values: any;
@@ -20,28 +17,37 @@ interface Props {
 }
 
 
-const Login = ({ loggedIn, login, loading }: { loggedIn: boolean, login: (dispatch: any) => void, loading: boolean }) => {
+const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: { loggedIn: boolean, login: (dispatch: any) => void, loading: boolean, serverErrors: any, defaultState: any }) => {
     const navigate = useNavigate()
 
     const [ show, setShow ] = useState(false)
-    const [ submit, setSubmit ] = useState(false)
+
+    const { values, errors, setField, verifyValidity, setError } = useFormHandler({ email: '', password: '' }, serverErrors)
+
+    useEffect(() => {
+        defaultState()
+    }, [ defaultState ])
+
     
+    const onSuccess = () => {
+        navigate('/home')
+    }
+
+
+    const loginRequest = async (e: any) => {
+        e.preventDefault()
+
+        setError('fullError', '')
+        
+        verifyValidity()
+
+        if(errors?.email?.length > 0 || errors?.password?.length > 0) return;
+        
+        login({ email: values.email, password: values.password, onSuccess })
+    }
     
     return (
-        <FormHandler initialValues={{ email: '', password: '' }} submit={submit} setSubmit={setSubmit}>
-            {({ values, errors, setField, verifyValidity }: Props) => {
-
-            const loginRequest = async (e: any) => {
-                e.preventDefault()
-                
-                verifyValidity()
-
-                if(errors.email.length > 0 || errors.password.length > 0) return;
-                
-                login({ email: values.email, password: values.password })
-            }
-
-            return (
+        errors &&
                 <div className={styles.content}>
                     <div className={styles.container}>
                         <h1>Login</h1>
@@ -51,10 +57,10 @@ const Login = ({ loggedIn, login, loading }: { loggedIn: boolean, login: (dispat
                                 placeholder='example@gmail.com' 
                                 value={values.email} 
                                 autoComplete='email'
-                                onChange={e => { setField('email', e.target.value) } } 
+                                onChange={e => { setField('email', e.target.value); setError('both', '') } } 
                                 variant='standard'
                                 helperText={errors.email}
-                                className={errors.email.length > 0 ? styles.error : ''}  
+                                className={errors?.email?.length > 0 ? styles.error : ''}  
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment
@@ -70,11 +76,11 @@ const Login = ({ loggedIn, login, loading }: { loggedIn: boolean, login: (dispat
                                 placeholder='123abc...' 
                                 value={values.password} 
                                 type={!show ? 'password' : 'text'}
-                                onChange={e => { setField('password', e.target.value) } } 
+                                onChange={e => { setField('password', e.target.value); setError('both', '') } } 
                                 variant='standard'
                                 autoComplete='password'
-                                helperText={errors.password}
-                                className={errors.password.length > 0 ? styles.error : ''}  
+                                helperText={errors.password || errors.both}
+                                className={(errors?.password?.length > 0 || errors?.both?.length) ? styles.error : ''}  
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment
@@ -94,7 +100,7 @@ const Login = ({ loggedIn, login, loading }: { loggedIn: boolean, login: (dispat
                             {!loading ?
                                     <div style={{ display: 'flex', alignItems: 'center', flexFlow: 'column wrap' }}>
                                         <button onClick={e => loginRequest(e)}>Sign in</button>
-                                        {errors.fullError.length > 0 && <span id='error'>Server Error</span>}
+                                        {errors?.fullError?.length > 0 && <span id='error'>Server Error</span>}
                                     </div>
                                 :
                                 <div style={{ display: 'flex', justifyContent: 'center'}}>
@@ -111,9 +117,7 @@ const Login = ({ loggedIn, login, loading }: { loggedIn: boolean, login: (dispat
 
                     </div>
                 </div>
-            )}}
-        </FormHandler>
     )
 }
 
-export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors, loading: state.auth.loading }), { login })(Login);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors, loading: state.auth.loading }), { login, defaultState })(Login);

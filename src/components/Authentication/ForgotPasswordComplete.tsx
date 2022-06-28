@@ -1,115 +1,83 @@
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useState, useEffect } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom'
 import axios from 'axios'
+import { connect } from 'react-redux'
 
 import styles from '../../styles/scss/Authentication/ForgotPassword.module.scss'
 import { server } from '../../config/index'
 import ErrorPage from '../Layout/ErrorPage'
+import useFormHandler from '../../hooks/FormHandler'
+import { completeForgotPassword, defaultState } from '../../actions/authActions'
+ 
 
-
-const Login = () => {
+const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgotPassword , defaultState}: { serverErrors: any, loading: boolean, loggedIn: boolean, completeForgotPassword: any, defaultState: any }) => {
     const navigate = useNavigate()
-    const [ check, setCheck ] = useState(false)
+    const location = useParams()
 
+
+    const [ startLoad, setStartLoad ] = useState(false)
+    const [ check, setCheck ] = useState(true)
+    
+    
     const { unique_url } = useParams() 
-
-
-
-    useEffect(() => {
-        let error = false
-        const verifyRequest = async (error: boolean) => {
-            const result = await axios.post(`${server}/api/authentication/forgot-password/verify/${unique_url}`)
-                                    .then(res => res.data)
-                                    .catch(err => {
-                                        error = true
-                                    })
-            return result;
-        }
-
-        const result: any = verifyRequest(error);
-
-        if(error) return;
-
-        if(result && result.message === 'Request found') {
-            setCheck(true)
-        } else return;
-    }, [ unique_url ])
-
-
-    const [ password, setPassword ] = useState('')
-    const [ confirmPassword, setConfirmPassword ] = useState('')     
 
     const [ showPassword, setShowPassword ] = useState(false)
     const [ showConfirmPassword, setShowConfirmPassword ] = useState(false)
 
-    const [ error, setError ] = useState({ password: false, confirmPassword: false })
-    const [ errorMessages, setErrorMessages ] = useState({ password: '', confirmPassword: '' })
-
-    const [ loading, setLoading ] = useState(false)
+    
     const [ sent, setSent ] = useState(false)
 
-    const [ fullError, setFullError ] = useState(false)
+    const { values, setError, setField, errors, verifyValidity } = useFormHandler({ password: '', confirmPassword: '' }, serverErrors)
+
+    useEffect(() => {
+        defaultState()
+    }, [ defaultState])
+
+
+    const onPageFail = () => {
+        setCheck(false)
+    }
+
+    const onSuccess = () => {
+        setSent(true)
+    }
+
+    useEffect(() => {
+        if(loggedIn && window.location.pathname === `/authentication/forgot-password/${unique_url}`) {
+            return navigate('/home')
+        }
+
+        const verifyRequest = async () => {
+            try {
+                await axios.post(`${server}/api/authentication/forgot-password/verify/${unique_url}`)
+            } catch (err: any) {
+                setCheck(false)
+            } 
+            setStartLoad(true)
+        }
+
+        verifyRequest()
+    }, [ unique_url, loggedIn, navigate ])  
+
+
     
     const changePassRequest = async (e: any) => {
         e.preventDefault()
 
+        setError('fullError', '')
 
-        setError({ 
-            password: password.length < 8 || password.length > 18,
-            confirmPassword: confirmPassword.length < 8 || confirmPassword.length > 18
-        })
+        verifyValidity()
 
-        setErrorMessages({
-            password: password.length < 8 ? 'Too short... (8chr)' : (password.length > 18 ? 'Too long... (18chr)' : ''),
-            confirmPassword: confirmPassword.length < 8 ? 'Too short... (8chr)' : (confirmPassword.length > 18 ? 'Too long... (18chr)' : '')
-        })
+        if(errors?.password?.length > 0 || errors?.confirmPassword?.length > 0) return;
 
-        if(password.length < 8 || password.length > 18 || confirmPassword.length < 8 || confirmPassword.length > 18) {
-            setLoading(false)
-            return;
-        }
-
-        setLoading(true)
-
-        const result = await axios.post(`${server}/api/authentication/forgot-password/change/${unique_url}`, { password, confirmPassword }, { withCredentials: true })
-                                .then(res => res.data)
-                                .catch(err => {
-                                    if(err && err.response && err.response.data.type && err.response.data.type === 'confirmPassword') {
-                                        setError({ ...error, confirmPassword: true })
-                                        setErrorMessages({
-                                            ...errorMessages,
-                                            confirmPassword: err.response.data.message
-                                        })
-                                    } else if(err && err.response && err.response.data.type && err.response.data.type === 'password') {
-                                        setError({ ...error, password: true })
-                                        setErrorMessages({
-                                            ...errorMessages,
-                                            password: err.response.data.message
-                                        })
-                                    } else if(err && err.response && err.response.data.type && err.response.data.type === 'both') {
-                                        setError({ confirmPassword: true, password: true })
-                                        setErrorMessages({
-                                            password: '',
-                                            confirmPassword: err.response.data.message
-                                        })
-                                    } else if(err && err.response && err.response.data.type && err.response.data.type === 'page') {
-                                        setCheck(false)
-                                    } else setFullError(true)
-                                    setLoading(false)
-                                })
-        if(result && result.message) {
-            setLoading(false)
-            setSent(true)
-        } else {
-            setLoading(false)
-        }
-        setLoading(false)
+        completeForgotPassword({ password: values.password, confirmPassword: values.confirmPassword, unique_url, onSuccess, onPageFail })
     }
     
+    if(!startLoad) return null;
     return (
-        check ?
+        !check ?
             <ErrorPage />
         :
             <div className={styles.content}>
@@ -121,13 +89,13 @@ const Login = () => {
                             <div className={styles.textfield_box}>
                                 <TextField 
                                     placeholder='123abc...' 
-                                    value={password} 
+                                    value={values.password} 
                                     type={!showPassword ? 'password' : 'text'}
-                                    onChange={e => { setPassword(e.target.value); if(error.password) { setError({ ...error, password: false }); setErrorMessages({ ...errorMessages, password: '' }) } } } 
+                                    onChange={e => { setField('password', e.target.value) } } 
                                     variant='standard'
                                     autoComplete='newPassword'
-                                    helperText={errorMessages.password}
-                                    className={error.password ? styles.error : ''}  
+                                    helperText={errors.password}
+                                    className={errors?.password?.length > 0 ? styles.error : ''}  
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment
@@ -144,13 +112,13 @@ const Login = () => {
 
                                 <TextField 
                                     placeholder='123abc...' 
-                                    value={confirmPassword} 
+                                    value={values.confirmPassword} 
                                     type={!showConfirmPassword ? 'password' : 'text'}
-                                    onChange={e => { setConfirmPassword(e.target.value); if(error.confirmPassword) { setError({ ...error, confirmPassword: false }); setErrorMessages({ ...errorMessages, confirmPassword: '' }) } } } 
+                                    onChange={e => { setField('confirmPassword', e.target.value) } } 
                                     variant='standard'
                                     autoComplete='newPassword'
-                                    helperText={errorMessages.confirmPassword}
-                                    className={error.confirmPassword ? styles.error : ''}  
+                                    helperText={errors.confirmPassword}
+                                    className={errors?.confirmPassword?.length > 0 ? styles.error : ''}  
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment
@@ -171,7 +139,7 @@ const Login = () => {
                                 {!loading ?
                                         <div style={{ display: 'flex', alignItems: 'center', flexFlow: 'column wrap', gap: '1em' }}>
                                             <button onClick={e => changePassRequest(e)}>Change password</button>
-                                            {fullError && <span id='error'>Error</span>}
+                                            {errors.fullError && <span id='error'>Error</span>}
                                         </div>
                                     :
                                         <div style={{ display: 'flex', justifyContent: 'center'}}>
@@ -206,4 +174,4 @@ const Login = () => {
     )
 }
 
-export default Login;
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors, loading: state.auth.loading }), { completeForgotPassword, defaultState })(ForgotPasswordComplete);
