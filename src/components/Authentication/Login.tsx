@@ -6,18 +6,11 @@ import { connect } from 'react-redux'
 
 import styles from '../../styles/scss/Authentication/Login.module.scss'
 import { login, defaultState } from '../../actions/authActions'
-import useFormHandler from '../../hooks/FormHandler'
-
-interface Props {
-    values: any;
-    errors: any;
-    setErrors: any;
-    setField: any;
-    verifyValidity: () => void
-}
+import useFormHandler from '../../hooks/useFormHandler'
+import { AuthPropsReducer } from '@typings'
 
 
-const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: { loggedIn: boolean, login: (dispatch: any) => void, loading: boolean, serverErrors: any, defaultState: any }) => {
+const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'register' | 'codeRegister' | 'forgotPassword'> ) => {
     const navigate = useNavigate()
 
     const [ show, setShow ] = useState(false)
@@ -25,7 +18,7 @@ const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: { logge
     const { values, errors, setField, verifyValidity, setError } = useFormHandler({ email: '', password: '' }, serverErrors)
 
     useEffect(() => {
-        defaultState()
+        defaultState({})
     }, [ defaultState ])
 
     
@@ -59,6 +52,7 @@ const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: { logge
                                 autoComplete='email'
                                 onChange={e => { setField('email', e.target.value); setError('both', '') } } 
                                 variant='standard'
+                                onKeyDown={e => { if(e.key === 'Enter') { loginRequest(e) } } } 
                                 helperText={errors.email}
                                 className={errors?.email?.length > 0 ? styles.error : ''}  
                                 InputProps={{
@@ -79,6 +73,7 @@ const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: { logge
                                 onChange={e => { setField('password', e.target.value); setError('both', '') } } 
                                 variant='standard'
                                 autoComplete='password'
+                                onKeyDown={e => { if(e.key === 'Enter') { loginRequest(e) } } } 
                                 helperText={errors.password || errors.both}
                                 className={(errors?.password?.length > 0 || errors?.both?.length) ? styles.error : ''}  
                                 InputProps={{

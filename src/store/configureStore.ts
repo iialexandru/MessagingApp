@@ -7,10 +7,10 @@ import { persistRootReducer } from '../reducers/index'
 
 const middleware = ReduxThunk
 
-const createStoreConst = () => {
+const configureStore = () => {
     let store = createStore(persistRootReducer, undefined, applyMiddleware(middleware))
     let persistor = persistStore(store)
-    return {persistor, store}
+    return { persistor, store }
 }
 
-export default createStoreConst;
+export default configureStore;

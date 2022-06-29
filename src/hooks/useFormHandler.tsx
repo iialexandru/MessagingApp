@@ -1,8 +1,8 @@
-import type { FC, Dispatch, SetStateAction} from 'react'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { FormHandler } from '@typings'
 
 
-const useFormHandler = (initialValues: any, serverErrors: any) => {
+const useFormHandler: (intialValues: any, serverErrors: any) => FormHandler = (initialValues, serverErrors: any) => {
     const [ errors, setErrors ] = useState<any>({})
     const [ values, setValues ] = useState<any>(initialValues)
 
@@ -66,7 +66,7 @@ const useFormHandler = (initialValues: any, serverErrors: any) => {
     }, [ serverErrors, setErrors ])
 
 
-    return { values, errors, setField, verifyValidity, setErrors, setError }
+    return { values, errors, setField, verifyValidity, setError }
 }
 
 export default useFormHandler;

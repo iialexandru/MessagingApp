@@ -6,18 +6,19 @@ import { connect } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import styles from '../../styles/scss/Authentication/Register.module.scss'
-import useFormHandler from '../../hooks/FormHandler'
+import useFormHandler from '../../hooks/useFormHandler'
 import { register, defaultState } from '../../actions/authActions'
+import { AuthPropsReducer } from '@typings'
 
 
-const Register = ({ loggedIn, serverErrors, register, loading, defaultState }: { loggedIn: boolean, serverErrors: any, register: any, loading: boolean, defaultState: any }) => {
+const Register = ({ serverErrors, register, loading, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'codeRegister' | 'forgotPassword'> ) => {
     const navigate = useNavigate()
     const [ show, setShow ] = useState(false)
     
     const { values, errors, setField, verifyValidity, setError } = useFormHandler({ email: '', password: '', username: '' }, serverErrors)
 
     useEffect(() => {
-        defaultState()
+        defaultState({})
     }, [ defaultState ])
 
 
@@ -54,6 +55,7 @@ const Register = ({ loggedIn, serverErrors, register, loading, defaultState }: {
                         autoComplete='username'
                         onChange={e => { setField('username', e.target.value) } } 
                         variant='standard'
+                        onKeyDown={e => { if(e.key === 'Enter') { registerRequest(e) } } } 
                         helperText={errors.username}
                         InputProps={{
                             startAdornment: (
@@ -76,6 +78,7 @@ const Register = ({ loggedIn, serverErrors, register, loading, defaultState }: {
                         name='email'
                         onChange={e => { setField('email', e.target.value) } } 
                         variant='standard'
+                        onKeyDown={e => { if(e.key === 'Enter') { registerRequest(e) } } } 
                         helperText={errors.email}
                         InputProps={{
                             startAdornment: (
@@ -99,6 +102,7 @@ const Register = ({ loggedIn, serverErrors, register, loading, defaultState }: {
                         type={!show ? 'password' : 'text'}
                         onChange={e => { setField('password', e.target.value) } } 
                         variant='standard'
+                        onKeyDown={e => { if(e.key === 'Enter') { registerRequest(e) } } } 
                         helperText={errors.password}
                         InputProps={{
                             startAdornment: (
@@ -119,7 +123,7 @@ const Register = ({ loggedIn, serverErrors, register, loading, defaultState }: {
                     {!loading ?
                         <div style={{ display: 'flex', alignItems: 'center', flexFlow: 'column wrap' }}>
                             <button onClick={e => registerRequest(e)}>Sign up</button>
-                            {errors.fullError && <span id='error'>Error</span>}
+                            {errors.fullError && <span id='error'>Server Error</span>}
                         </div>
                     :
                         <div style={{ display: 'flex', justifyContent: 'center', height: 80 }}>

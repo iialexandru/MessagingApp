@@ -13,23 +13,17 @@ const INITIAL_STATE = {
 
 
 export enum AUTH_ACTIONS {
+    DEFAULT_STATE = 'DEFAULT_STATE',
     LOGGED_IN = 'LOGGED_IN',
     NOT_LOGGED_IN = 'NOT_LOGGED_IN',
-    DEFAULT_STATE = 'DEFAULT_STATE',
     START_LOADING = 'START_LOADING',
     STOP_LOADING = 'STOP_LOADING',
     LOG_IN_FAIL = 'LOG_IN_FAIL',
     LOG_IN_SUCCESS = 'LOG_IN_SUCCESS',
-    REGISTER_START = 'REGISTER_START',
-    REGISTER_END = 'REGISTER_END',
     REGISTER_FAIL = 'REGISTER_FAIL',
     REGISTER_SUCCESS = 'REGISTER_SUCCESS',
-    CODE_REGISTER_START = 'CODE_REGISTER_START',
-    CODE_REGISTER_END = 'CODE_REGISTER_END',
     CODE_REGISTER_FAIL = 'CODE_REGISTER_FAIL',
     CODE_REGISTER_SUCCESS = 'CODE_REGISTER_SUCCESS',
-    FP_START = 'FP_START',
-    FP_END = 'FP_END',
     FP_FAIL = 'FP_FAIL',
     FP_SUCCESS = 'FP_SUCCESS',
 }
@@ -90,18 +84,6 @@ const reducer = (state = INITIAL_STATE, action: any) => {
                 loggedIn: true
             }
         }
-        case AUTH_ACTIONS.REGISTER_START: {
-            return {
-                ...state,
-                loading: true,
-            }
-        }
-        case AUTH_ACTIONS.REGISTER_END: {
-            return {
-                ...state,
-                loading: false
-            }
-        }
         case AUTH_ACTIONS.REGISTER_FAIL: {
             return {
                 ...state,
@@ -113,18 +95,6 @@ const reducer = (state = INITIAL_STATE, action: any) => {
             }
         }
         case AUTH_ACTIONS.REGISTER_SUCCESS: {
-            return {
-                ...state,
-                loading: false
-            }
-        }
-        case AUTH_ACTIONS.CODE_REGISTER_START: {
-            return {
-                ...state,
-                loading: true
-            }
-        }
-        case AUTH_ACTIONS.CODE_REGISTER_END: {
             return {
                 ...state,
                 loading: false
@@ -145,18 +115,6 @@ const reducer = (state = INITIAL_STATE, action: any) => {
                 ...state,
                 loading: false,
                 loggedIn: true
-            }
-        }
-        case AUTH_ACTIONS.FP_START: {
-            return {
-                ...state,
-                loading: true
-            }
-        }
-        case AUTH_ACTIONS.FP_END: {
-            return {
-                ...state,
-                loading: false
             }
         }
         case AUTH_ACTIONS.FP_FAIL: {

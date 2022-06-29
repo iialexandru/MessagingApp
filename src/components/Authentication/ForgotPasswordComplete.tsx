@@ -1,21 +1,20 @@
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useState, useEffect } from 'react'
-import { Link, useNavigate, useParams, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { connect } from 'react-redux'
 
 import styles from '../../styles/scss/Authentication/ForgotPassword.module.scss'
 import { server } from '../../config/index'
 import ErrorPage from '../Layout/ErrorPage'
-import useFormHandler from '../../hooks/FormHandler'
+import useFormHandler from '../../hooks/useFormHandler'
 import { completeForgotPassword, defaultState } from '../../actions/authActions'
+import { AuthPropsReducer } from '@typings'
  
 
-const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgotPassword , defaultState}: { serverErrors: any, loading: boolean, loggedIn: boolean, completeForgotPassword: any, defaultState: any }) => {
+const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgotPassword , defaultState }: Omit<AuthPropsReducer, 'register' | 'login' | 'codeRegister' | 'forgotPassword'> ) => {
     const navigate = useNavigate()
-    const location = useParams()
-
 
     const [ startLoad, setStartLoad ] = useState(false)
     const [ check, setCheck ] = useState(true)
@@ -32,7 +31,7 @@ const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgo
     const { values, setError, setField, errors, verifyValidity } = useFormHandler({ password: '', confirmPassword: '' }, serverErrors)
 
     useEffect(() => {
-        defaultState()
+        defaultState({})
     }, [ defaultState])
 
 
@@ -95,6 +94,7 @@ const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgo
                                     variant='standard'
                                     autoComplete='newPassword'
                                     helperText={errors.password}
+                                    onKeyDown={e => { if(e.key === 'Enter') { changePassRequest(e) } } } 
                                     className={errors?.password?.length > 0 ? styles.error : ''}  
                                     InputProps={{
                                         startAdornment: (
@@ -116,6 +116,7 @@ const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgo
                                     type={!showConfirmPassword ? 'password' : 'text'}
                                     onChange={e => { setField('confirmPassword', e.target.value) } } 
                                     variant='standard'
+                                    onKeyDown={e => { if(e.key === 'Enter') { changePassRequest(e) } } } 
                                     autoComplete='newPassword'
                                     helperText={errors.confirmPassword}
                                     className={errors?.confirmPassword?.length > 0 ? styles.error : ''}  
@@ -139,7 +140,7 @@ const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgo
                                 {!loading ?
                                         <div style={{ display: 'flex', alignItems: 'center', flexFlow: 'column wrap', gap: '1em' }}>
                                             <button onClick={e => changePassRequest(e)}>Change password</button>
-                                            {errors.fullError && <span id='error'>Error</span>}
+                                            {errors.fullError && <span id='error'>Server Error</span>}
                                         </div>
                                     :
                                         <div style={{ display: 'flex', justifyContent: 'center'}}>

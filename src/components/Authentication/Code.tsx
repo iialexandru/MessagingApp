@@ -7,12 +7,13 @@ import { useEffect, useState } from 'react'
 
 import styles from '../../styles/scss/Authentication/Register.module.scss'
 import { codeRegister, defaultState } from '../../actions/authActions'
-import useFormHandler from '../../hooks/FormHandler'
+import useFormHandler from '../../hooks/useFormHandler'
 import { server } from '../../config/index'
 import ErrorPage from '../Layout/ErrorPage'
+import { AuthPropsReducer } from '@typings'
 
 
-const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: { loggedIn: boolean, loading: boolean, codeRegister: any, serverErrors: any, defaultState: any }) => {
+const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'register' | 'forgotPassword'> ) => {
     const navigate = useNavigate()
     
     const [ found, setFound ] = useState(true)
@@ -23,7 +24,7 @@ const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: {
     const { values, errors, setField, verifyValidity, setError } = useFormHandler({ code: '' }, serverErrors)
 
     useEffect(() => {
-        defaultState()
+        defaultState({})
     }, [ defaultState ])
 
 
@@ -45,7 +46,7 @@ const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: {
             setStartLoad(true)
         } 
         verifyValidityURL()
-    }, [ url_param, loggedIn ])
+    }, [ url_param, loggedIn, navigate ])
 
 
     const registerCompleteRequest = async (e: any) => {

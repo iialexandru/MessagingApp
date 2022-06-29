@@ -5,11 +5,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import styles from '../../styles/scss/Authentication/ForgotPassword.module.scss'
-import useFormHandler from '../../hooks/FormHandler'
+import useFormHandler from '../../hooks/useFormHandler'
 import { forgotPassword, defaultState } from '../../actions/authActions'
+import { AuthPropsReducer } from '@typings'
 
 
-const Login = ({ loggedIn, loading, serverErrors, forgotPassword, defaultState }: { loggedIn: boolean, loading: boolean, serverErrors: any, forgotPassword: any, defaultState: any }) => {
+const Login = ({ loading, serverErrors, forgotPassword, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'codeRegister' | 'register'> ) => {
     const navigate = useNavigate()
 
     const [ sent, setSent ] = useState(false)
@@ -18,7 +19,7 @@ const Login = ({ loggedIn, loading, serverErrors, forgotPassword, defaultState }
 
 
     useEffect(() => {
-        defaultState()
+        defaultState({})
     }, [ defaultState ])
 
 
@@ -54,6 +55,7 @@ const Login = ({ loggedIn, loading, serverErrors, forgotPassword, defaultState }
                                 placeholder='example@gmail.com' 
                                 value={values.email} 
                                 onChange={e => { setField('email', e.target.value) } } 
+                                onKeyDown={e => { if(e.key === 'Enter') { forgotPassRequest(e) } } } 
                                 variant='standard'
                                 helperText={errors.email}
                                 autoComplete='email'

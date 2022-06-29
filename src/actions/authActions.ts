@@ -4,6 +4,7 @@ import { AUTH_ACTIONS } from '../reducers/authReducer'
 import { server } from '../config/index'
 
 
+
 export const verifyLogin = () => async (dispatch: any) => {
     try {
         await axios.post(`${server}/api/miscellaneous/isAuthenticated`, {}, { withCredentials: true })
@@ -25,6 +26,8 @@ export const defaultState = () => (dispatch: any) => {
     })
 }
 
+
+
 export const login = ({ email, password, onSuccess }: { email: string, password: string, onSuccess: () => void }) => async (dispatch: any) => {
     dispatch({
         type: AUTH_ACTIONS.START_LOADING
@@ -40,8 +43,9 @@ export const login = ({ email, password, onSuccess }: { email: string, password:
             payload: { result }
         })
 
-        return onSuccess()
-
+        onSuccess()
+        
+        return
     } catch (err: any) {
         if(err && err.response && err.response.data.type && err.response.data.type === 'email') {
             dispatch({
@@ -76,8 +80,7 @@ export const login = ({ email, password, onSuccess }: { email: string, password:
 
 export const register = ({ email, password, username, onSuccess }: {  email: string, password: string, username: string, onSuccess: (param: string) => void }) => async (dispatch: any) => {
     dispatch({
-        type: AUTH_ACTIONS.REGISTER_START,
-        payload: { loading: true }
+        type: AUTH_ACTIONS.START_LOADING
     })
 
     const data = { email, password, username }
@@ -91,12 +94,12 @@ export const register = ({ email, password, username, onSuccess }: {  email: str
         })
 
         dispatch({
-            type: AUTH_ACTIONS.REGISTER_END,
-            payload: { loading: false }
+            type: AUTH_ACTIONS.STOP_LOADING
         })
 
-        return onSuccess(result.uniqueParam)
+        onSuccess(result.uniqueParam)
         
+        return
     } catch (err: any) {
         if(err && err.response && err.response.data.type && err.response.data.type === 'email') {
             dispatch({
@@ -122,8 +125,7 @@ export const register = ({ email, password, username, onSuccess }: {  email: str
     }
 
     dispatch({
-        type: AUTH_ACTIONS.REGISTER_END,
-        payload: { loading: false }
+        type: AUTH_ACTIONS.STOP_LOADING
     })
 }
 
@@ -131,8 +133,7 @@ export const register = ({ email, password, username, onSuccess }: {  email: str
 
 export const codeRegister = ({ code, onSuccess }: { code: string, onSuccess: () => void }) => async (dispatch: any) => {
     dispatch({
-        type: AUTH_ACTIONS.CODE_REGISTER_START,
-        payload: { loading: true }
+        type: AUTH_ACTIONS.START_LOADING
     })
 
 
@@ -145,12 +146,12 @@ export const codeRegister = ({ code, onSuccess }: { code: string, onSuccess: () 
         })
 
         dispatch({
-            type: AUTH_ACTIONS.CODE_REGISTER_END,
-            payload: { loading: false }
+            type: AUTH_ACTIONS.STOP_LOADING
         })
 
-        return onSuccess()
+        onSuccess()
         
+        return
     } catch (err: any) {
         if(err && err.response && err.response.data.type && err.response.data.type === 'code') {
             dispatch({
@@ -166,8 +167,7 @@ export const codeRegister = ({ code, onSuccess }: { code: string, onSuccess: () 
     }
 
     dispatch({
-        type: AUTH_ACTIONS.CODE_REGISTER_END,
-        payload: { loading: false }
+        type: AUTH_ACTIONS.STOP_LOADING
     })
 }
 
@@ -175,7 +175,7 @@ export const codeRegister = ({ code, onSuccess }: { code: string, onSuccess: () 
 
 export const forgotPassword = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
     dispatch({
-        type: AUTH_ACTIONS.FP_START
+        type: AUTH_ACTIONS.START_LOADING
     })
 
     try {
@@ -185,7 +185,9 @@ export const forgotPassword = ({ email, onSuccess }: { email: string, onSuccess:
             type: AUTH_ACTIONS.FP_SUCCESS
         })
         
-        return onSuccess()
+        onSuccess()
+        
+        return
     } catch (err: any) {
         dispatch({
             type: AUTH_ACTIONS.FP_FAIL,
@@ -194,14 +196,14 @@ export const forgotPassword = ({ email, onSuccess }: { email: string, onSuccess:
     }
 
     dispatch({
-        type: AUTH_ACTIONS.FP_END
+        type: AUTH_ACTIONS.STOP_LOADING
     })
 }
 
 
 export const completeForgotPassword = ({ password, confirmPassword, unique_url, onSuccess, onPageFail }: { password: string, confirmPassword: string, unique_url: string, onSuccess: () => void, onPageFail: () => void }) => async (dispatch: any) => {
     dispatch({
-        type: AUTH_ACTIONS.FP_START
+        type: AUTH_ACTIONS.START_LOADING
     })
 
     try {
@@ -211,7 +213,9 @@ export const completeForgotPassword = ({ password, confirmPassword, unique_url, 
             type: AUTH_ACTIONS.FP_SUCCESS
         })
 
-        return onSuccess()
+        onSuccess()
+
+        return
     } catch (err: any) {
         if(err && err.response && err.response.data.type && err.response.data.type === 'password') {
             dispatch({
@@ -225,10 +229,12 @@ export const completeForgotPassword = ({ password, confirmPassword, unique_url, 
             })
         }  else if(err && err.response && err.response.data.type && err.response.data.type === 'page') {
             dispatch({
-                type: AUTH_ACTIONS.FP_END
+                type: AUTH_ACTIONS.STOP_LOADING
             })
 
-            return onPageFail()
+            onPageFail()
+
+            return
         } else {
             dispatch({
                 type: AUTH_ACTIONS.FP_FAIL,
@@ -238,6 +244,6 @@ export const completeForgotPassword = ({ password, confirmPassword, unique_url, 
     }
 
     dispatch({
-        type: AUTH_ACTIONS.FP_END
+        type: AUTH_ACTIONS.STOP_LOADING
     })
 }
