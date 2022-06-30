@@ -5,7 +5,7 @@ import { server } from '../config/index'
 
 
 export const updateFriends = () => async (dispatch: any) => {
-    console.log("I was called");
+
     dispatch({
         type: SOCIAL_ACTIONS.START_LOADING
     })
@@ -45,11 +45,11 @@ export const addFriend = ({ email, onSuccess }: { email: string, onSuccess: () =
     }
 }
 
-export const removeFriend = ({ email }: { email: string }) => async (dispatch: any) => {
+export const removeFriend = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
     try {
         (await axios.post(`${server}/api/social/remove-friend`, { email }, { withCredentials: true }))
 
-        updateFriends()
+        onSuccess()
     } catch (err) {
         console.log(err)
     }

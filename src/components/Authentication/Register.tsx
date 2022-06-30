@@ -74,7 +74,7 @@ const Register = ({ serverErrors, register, loading, defaultState }: Omit<AuthPr
                         value={values.email} 
                         id='email'
                         autoComplete='email'
-                        className={errors?.password?.length > 0 ? styles.error : ''}  
+                        className={errors?.email?.length > 0 ? styles.error : ''}  
                         name='email'
                         onChange={e => { setField('email', e.target.value) } } 
                         variant='standard'

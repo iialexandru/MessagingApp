@@ -1,26 +1,47 @@
 import type { FC, Dispatch, SetStateAction } from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
-import { TextMessage } from '@typings'
+import axios from 'axios'
 
 import styles from '../../../styles/scss/Home/Conversation/MessageContainer.module.scss';
+import { TextMessage } from '@typings'
+import { server } from '../../../config/index'
+
 
 interface Props {
     setMessages: Dispatch<SetStateAction<TextMessage[]>>;
+    setRefreshConv: Dispatch<SetStateAction<boolean>>;
+    refreshConv: boolean;
     messages: TextMessage[];
+    conversationId: string;
+    scrollRef: any;
+    userId: string;
+    socket: any;
+    peopleIds: any;
 }
 
 
-const CreateMessage: FC<Props> = ({ setMessages, messages }) => {
+const CreateMessage: FC<Props> = ({ setMessages, messages, conversationId, setRefreshConv, refreshConv, scrollRef, userId, socket, peopleIds }) => {
     const [ text, setText ] = useState('')
     const [ loading, setLoading ] = useState(false)
     const [ start, setStart ] = useState(false)
 
+    const sendSocketMessage = (recipients: any, text: string, date: string, conversationId: string, userId: string) => {
+        socket.emit('send-message', { recipients, text, date, conversationId, userId})
+    }
 
-    const sendMessage = (e: any) => {
+    useEffect(() => {
+        
+    }, [ socket ])
+
+
+
+    const sendMessage = async (e: any) => {
         e.preventDefault()
 
-        if(start || loading) return;
+        const date = format(new Date(), 'dd-MM-yyyy')
+
+        if(start || loading || !text.length) return;
 
         setStart(true)
 
@@ -28,8 +49,13 @@ const CreateMessage: FC<Props> = ({ setMessages, messages }) => {
 
         setLoading(true);
 
+        try {
+            sendSocketMessage(peopleIds, text, date, conversationId, userId)
+        } catch (err) {
+            console.log(err)
+        }
+
         setText('')
-        setMessages([ ...messages, { index: 2, text, date: format(new Date(), 'dd-MM-yyyy')} ])
         setLoading(false)
         setStart(false)
     }

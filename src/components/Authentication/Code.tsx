@@ -76,7 +76,8 @@ const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: O
                     <div className={styles.textfield_box}>
                         <TextField 
                             value={values.code} 
-                            onChange={e => { setField('code', e.target.value) } } 
+                            onChange={e => { setField('code', e.target.value) } }
+                            onKeyDown={e => { if(e.key === 'Enter') { registerCompleteRequest(e) } } } 
                             variant='standard'
                             className={errors?.code?.length > 0 ? styles.error : ''}
                             helperText={errors.code}

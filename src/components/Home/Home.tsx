@@ -1,17 +1,37 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { connect } from 'react-redux'
 
 import styles from '../../styles/scss/Home/Home.module.scss';
 import MessSection from './Conversation/MessSection'
 import Toolbar from './Toolbar'
 import MessageContainer from './Conversation/MessageContainer'
 import SocialContainer from './Social/SocialContainer'
+import { server } from '../../config/index'
 
 import { Section } from '@typings'
 
 
-const Home = () => {
+const Home = ({ username, email, userId }: { username: string, email: string, userId: string }) => {
     const [ section, setSection ] = useState<Section>('None')
     const [ selected, setSelected ] = useState('')
+    const [ conversations, setConversations ] = useState<any>(null)
+
+    useEffect(() => {
+        const source = axios.CancelToken.source()
+        const getConversations = async () => {
+            const result = (await axios.get(`${server}/api/conversation/show-conversations`, { withCredentials: true })).data
+
+            setConversations(result.conversations)
+        }
+
+        getConversations()
+
+        return () => {
+            source.cancel()
+        }
+    }, [])
 
     return (
         <div className={styles.container}>
@@ -25,16 +45,22 @@ const Home = () => {
                     </div>
 
                     <div className={styles.section_container}>
-                        <MessSection setSection={setSection} />
-                        <MessSection setSection={setSection} />
-                        <MessSection setSection={setSection} />
-                        <MessSection setSection={setSection} />
+                        {conversations && 
+                            conversations.map((conversation: any, key: number) => {
+                                return (
+                                    !conversation.group ?
+                                        <MessSection key={key} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={conversation.messages[0].text} conversationId={conversation._id}  />
+                                    :
+                                        <MessSection key={key} setSection={setSection} myUsername={username} myEmail={email} message={''} conversationId={conversation._id} />
+                                )
+                            })
+                        }                        
                     </div>
                 </div>
 
                 <div className={styles.replacer}>
                     <Toolbar setSection={setSection} section={section} />
-                    {section === 'Messages' && <MessageContainer /> }
+                    {(section === 'Messages' && Cookies.get('conversation')) && <MessageContainer userId={userId} myUsername={username} myEmail={email} conversationId={Cookies.get('conversation')!} /> }
                     {section === 'Social' && <SocialContainer /> }
                 </div>
             </div>
@@ -42,4 +68,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default connect((state: any) => ({ email: state.auth.email, username: state.auth.username, userId: state.auth.userId }))(Home);

@@ -2,6 +2,7 @@ export interface TextMessage {
     text: string;
     date: string;
     index: 1 | 2;
+    senderEmail: string;
 }
 
 export type Section = 'Messages' | 'Social' | 'Profile' | 'None'

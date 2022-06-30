@@ -9,8 +9,8 @@ import { showPeopleSearch, resetPeopleSearch} from '../../../../actions/socialAc
 
 const AddFriend = ({ peopleSearch, showPeopleSearch, psLoading, resetPeopleSearch }: { peopleSearch: any, showPeopleSearch: (dispatch: any) => void, psLoading: boolean, resetPeopleSearch: (dispatch: any) => void }) => {
     const [ search, setSearch ] = useState('')
-    // useDebounce(search, 1000)
-    // console.log(peopleSearch)
+
+    
     useEffect(() => {
         showPeopleSearch({ email: search })
     }, [ search, showPeopleSearch ])

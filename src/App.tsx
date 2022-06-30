@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { useState } from 'react'
 

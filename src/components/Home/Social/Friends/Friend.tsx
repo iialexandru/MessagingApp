@@ -19,14 +19,13 @@ interface Item {
 
 const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, removeFriend, updateFriends }) => {
     const [ active, setActive ]  = useState<boolean>(false)
-    // const [ isBlocked, setIsBlocked ] = useState(blocked)
 
     const [ loading, setLoading ] = useState(false)
 
     const onSuccess = () => {
-        // setIsBlocked(!isBlocked)
         updateFriends({})
     }
+
 
     const block = (e: any) => {
         e.preventDefault()
@@ -62,7 +61,7 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
 
         setLoading(true)
 
-        removeFriend({ email })
+        removeFriend({ email, onSuccess })
         
         setLoading(false)
     }

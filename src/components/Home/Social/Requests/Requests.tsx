@@ -8,6 +8,7 @@ import { resetPeopleSearch, showFriendRequests } from '../../../../actions/socia
 
 const Requests = ({ resetPeopleSearch, showFriendRequests, friendRequests, loading }: { resetPeopleSearch: (dispatch: any) => void, showFriendRequests: (dispatch: any) => void, friendRequests: any, loading: true  }) => {
     const [ search, setSearch ] = useState('')
+    const [ _friendRequests, setFriendRequests ] = useState(friendRequests)
 
     useEffect(() => {
         resetPeopleSearch({})
@@ -17,14 +18,46 @@ const Requests = ({ resetPeopleSearch, showFriendRequests, friendRequests, loadi
         showFriendRequests({})
     }, [ showFriendRequests ])
 
+    useEffect(() => {
+        if(!search.length) {
+            setFriendRequests(friendRequests)
+            return
+        }
+        
+        const newFriendRequests: any = []
+
+        const letters = search.split('')
+        
+        _friendRequests.forEach((friend: any) => {
+            const friendLetters = friend.email.split('')
+
+            if(friendLetters.length < letters.length) return;
+
+            let valid = true
+
+            console.log(friendLetters, letters)
+            for(let i = 0; i < letters.length; i++) {
+                if(friendLetters[i] !== letters[i]) {
+                    valid = false
+                    break
+                }
+            }
+
+            if(!valid) return
+
+            newFriendRequests.push(friend)
+        })
+        setFriendRequests(newFriendRequests)
+    }, [ search ])
+
     return (
         <div className={styles.friends_container}>
             <input value={search} onChange={e => setSearch(e.target.value)} />
-            {(friendRequests && parseInt(friendRequests.length) > 0) &&
+            {(_friendRequests && parseInt(_friendRequests.length) > 0) &&
                 <>
                     {!loading ?
                             <>
-                                {friendRequests.map((person: { email: string, username: string}, key: number) => {
+                                {_friendRequests.map((person: { email: string, username: string}, key: number) => {
                                     return (
                                         <div key={key} className={styles.values}>
                                             <Request  email={person.email} name={person.username} />
@@ -41,7 +74,7 @@ const Requests = ({ resetPeopleSearch, showFriendRequests, friendRequests, loadi
 
             }
             
-            {(!friendRequests || parseInt(friendRequests.length) === 0) &&
+            {(!_friendRequests || parseInt(_friendRequests.length) === 0) &&
                 <div className={styles.none}>
                     <h2>No results found</h2>
                 </div>

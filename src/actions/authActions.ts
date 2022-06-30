@@ -7,10 +7,11 @@ import { server } from '../config/index'
 
 export const verifyLogin = () => async (dispatch: any) => {
     try {
-        await axios.post(`${server}/api/miscellaneous/isAuthenticated`, {}, { withCredentials: true })
+        const result = (await axios.post(`${server}/api/miscellaneous/isAuthenticated`, {}, { withCredentials: true })).data
 
         dispatch({
-            type: AUTH_ACTIONS.LOGGED_IN
+            type: AUTH_ACTIONS.LOGGED_IN,
+            payload: { name: result.username, email: result.email, id: result.userId }
         })
     } catch (err) {
         dispatch({

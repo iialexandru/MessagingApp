@@ -1,6 +1,9 @@
 const INITIAL_STATE = {
     loggedIn: false,
-    loading: false,
+    loading: false,    
+    username: '',
+    email: '',
+    userId: '',
     errors: {
         email: '',
         password: '',
@@ -33,13 +36,19 @@ const reducer = (state = INITIAL_STATE, action: any) => {
         case AUTH_ACTIONS.LOGGED_IN: {
             return {
                 ...state,
-                loggedIn: true
+                loggedIn: true,
+                username: action.payload.username,
+                email: action.payload.email,
+                userId: action.payload.id
             }
         }
         case AUTH_ACTIONS.NOT_LOGGED_IN: {
             return {
                 ...state,
-                loggedIn: false
+                loggedIn: false,
+                username: '',
+                email: '',
+                userId: ''
             }
         }
         case AUTH_ACTIONS.START_LOADING: {
