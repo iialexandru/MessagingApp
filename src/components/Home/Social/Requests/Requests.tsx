@@ -16,7 +16,7 @@ const Requests = ({ resetPeopleSearch, showFriendRequests, friendRequests, loadi
 
     useEffect(() => {
         showFriendRequests({})
-    }, [ showFriendRequests ])
+    }, [])
 
     useEffect(() => {
         if(!search.length) {

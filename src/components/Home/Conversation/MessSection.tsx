@@ -13,13 +13,14 @@ interface Props {
     person?: any;
     message: string;
     conversationId: string;
+    setConversationId: Dispatch<SetStateAction<any>>
 }
 
 
-const MessSection: FC<Props> = ({ setSection, person, message, conversationId }) => {
+const MessSection: FC<Props> = ({ setSection, person, message, conversationId, setConversationId }) => {
 
     return (
-        <div onClick={() => { Cookies.set('conversation', conversationId); setSection('Messages') } } className={styles.section}>
+        <div onClick={() => { setConversationId(conversationId); setSection('Messages') } } className={styles.section}>
             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655985701/MessagingApp/man_5-512_esb1fi.webp' width={40} height={40} alt='Friend' />
 
             <div className={styles.info}>

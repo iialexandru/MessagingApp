@@ -15,8 +15,10 @@ import { Section } from '@typings'
 
 const Home = ({ username, email, userId }: { username: string, email: string, userId: string }) => {
     const [ section, setSection ] = useState<Section>('None')
-    const [ selected, setSelected ] = useState('')
     const [ conversations, setConversations ] = useState<any>(null)
+
+    const [ conversationId, setConversationId ] = useState(null)
+
 
     useEffect(() => {
         const source = axios.CancelToken.source()
@@ -47,11 +49,13 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
                     <div className={styles.section_container}>
                         {conversations && 
                             conversations.map((conversation: any, key: number) => {
+                                let lastMessage = conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].text : ''
+
                                 return (
                                     !conversation.group ?
-                                        <MessSection key={key} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={conversation.messages[0].text} conversationId={conversation._id}  />
+                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={lastMessage} conversationId={conversation._id}  />
                                     :
-                                        <MessSection key={key} setSection={setSection} myUsername={username} myEmail={email} message={''} conversationId={conversation._id} />
+                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} message={''} conversationId={conversation._id} />
                                 )
                             })
                         }                        
@@ -60,7 +64,7 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
 
                 <div className={styles.replacer}>
                     <Toolbar setSection={setSection} section={section} />
-                    {(section === 'Messages' && Cookies.get('conversation')) && <MessageContainer userId={userId} myUsername={username} myEmail={email} conversationId={Cookies.get('conversation')!} /> }
+                    {(section === 'Messages' && conversationId) && <MessageContainer userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> }
                     {section === 'Social' && <SocialContainer /> }
                 </div>
             </div>
