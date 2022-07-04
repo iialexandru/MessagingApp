@@ -121,7 +121,6 @@ const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewC
         }
     }, [ inView, activate, loading, total, initialLoading, newContainer, renderFirstTime ])
 
-    console.log(scrollContainer.current)
     return (
         <div className={styles.container}>
 
@@ -135,7 +134,7 @@ const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewC
                 }
                 {(messages.length > 0 && !initialLoading) ?
                     <>
-                        {messages.map((message: TextMessage, key: number, arr: any) => {
+                        {messages.map((message: TextMessage, key: number) => {
                             if(key === 29 && messages.length === 30 && !renderFirstTime) {
                                 setTimeout(() => setRenderFirstTime(true), 0)
                             }

@@ -23,7 +23,7 @@ interface Props {
 const MessSection: FC<Props> = ({ setSection, person, message, conversationId, setConversationId, setNewContainer, globalConversationId }) => {
 
     return (
-        <div onClick={() => { if(conversationId !== globalConversationId) { setNewContainer(true); setConversationId(conversationId); setSection('Messages') } } } className={styles.section}>
+        <div onClick={() => { if(conversationId !== globalConversationId) { setNewContainer(true); setConversationId(conversationId); setSection('Messages') } } } className={`${conversationId === globalConversationId ? styles.active_section : ''} ${styles.section}`}>
             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655985701/MessagingApp/man_5-512_esb1fi.webp' width={40} height={40} alt='Friend' />
 
             <div className={styles.info}>
