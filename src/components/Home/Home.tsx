@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { connect } from 'react-redux'
+import { parse } from 'node-html-parser'
 
 import styles from '../../styles/scss/Home/Home.module.scss';
 import MessSection from './Conversation/MessSection'
@@ -18,6 +19,7 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
     const [ conversations, setConversations ] = useState<any>(null)
 
     const [ conversationId, setConversationId ] = useState(null)
+    const [ newContainer, setNewContainer ] = useState(false)
 
 
     useEffect(() => {
@@ -49,14 +51,14 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
                     <div className={styles.section_container}>
                         {conversations && 
                             conversations.map((conversation: any, key: number) => {
-                                let lastMessage = conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].text : ''
+                                let lastMessage = conversation.messages[0] ? (!conversation.messages[conversation.messages.length - 1].text.length ? '<div style="display: flex; alignItems: center; gap: 5px "><img src=\'https://res.cloudinary.com/multimediarog/image/upload/v1656924938/MessagingApp/image-941_nxgiwm.png\' width={20} height={20} alt=\'img\' /> <span>Image</span></div> ' : conversation.messages[conversation.messages.length - 1].text ) : ''
 
                                 return (
                                     !conversation.group ?
-                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={lastMessage} conversationId={conversation._id}  />
+                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={lastMessage} conversationId={conversation._id} globalConversationId={conversationId} setNewContainer={setNewContainer}  />
                                     :
-                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} message={''} conversationId={conversation._id} />
-                                )
+                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} message={''} conversationId={conversation._id} setNewContainer={setNewContainer} globalConversationId={conversationId} />
+                                ) 
                             })
                         }                        
                     </div>
@@ -64,7 +66,7 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
 
                 <div className={styles.replacer}>
                     <Toolbar setSection={setSection} section={section} />
-                    {(section === 'Messages' && conversationId) && <MessageContainer userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> }
+                    {(section === 'Messages' && conversationId) && <MessageContainer newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> }
                     {section === 'Social' && <SocialContainer /> }
                 </div>
             </div>

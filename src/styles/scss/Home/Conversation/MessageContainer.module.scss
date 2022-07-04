@@ -13,8 +13,69 @@
     padding-inline: 1em;
     color: white;
     word-wrap: break-all;
+    word-break: break-word;
     transition: background-color .25s;
 }
+
+@keyframes pulsating {
+    0% { background-color: rgb(200, 200, 200); }
+    100% { background-color: rgb(225, 225, 225); }
+}
+
+.skeleton_container {
+    display: flex;
+    flex-flow: column-reverse nowrap;
+    gap: 2em;
+
+    @for $i from 0 to 10 {
+        .skeleton_message{
+            width: 100px;
+            height: 35px;
+            background-color: rgb(200, 200, 200);
+            border-radius: 20px;
+                
+            &:nth-child(#{$i}) {
+                width: calc(10px * (random(11) + 6));
+                animation: pulsating 1s infinite alternate linear;
+
+                @if  $i == 2 or $i == 5 or $i == 9 {
+                    align-self: flex-end;
+                } @else if $i == 1 or $i == 3 or $i == 4 or $i == 6 or $i == 0  {
+                    align-self: flex-start;
+                }
+            }
+        }
+    }
+}
+
+.loader_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column nowrap;
+    color: rgb(200, 200, 200);
+    gap: .2em;
+    font-family: 'Baloo Bhai 2';
+    
+    span {
+        margin-right: -10px;
+    }
+}
+
+.loader {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #7f7f7f;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 
 .messages_container {
     display: flex;
@@ -54,25 +115,69 @@
 }
 
 .tooltext {
+    position: relative;
     height: 70px;
     width: 100%;
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 1em;
     padding-inline: 2em;
+}
 
+.input_create { 
+    width: 100%;
+    position: relative;
+    
     input {
         width: 100%;
-        height: 60%;
         border-radius: 10px;
         border: 2px solid $green;
-        padding-left: .6em;
+        padding: .8em .6em;
+        padding-right: 3em;
 
         &:focus, &:focus-within, &:focus-visible {
             outline: none;
         }
         
+    }
+
+    img {
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        cursor: pointer;
+    }
+}
+
+.container_images {
+    position: absolute;
+    top: -100px;
+    height: 95px;
+    width: calc(100% - 7.6em);
+    overflow-x: scroll;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    overflow-y: hidden;
+    background-color: #E2E2E2;
+    padding-inline: .4em;
+
+    @include Scrollbar;
+}
+
+.tool_image {
+    position: relative;
+
+    img[id='delete'] {
+        z-index: 9999;
+        cursor: pointer;
+        position: absolute;
+        right: 0px;
+        top: 8px;
+    }
+
+    img:not([id='delete']) {
+        margin-top: 8px;
     }
 }
 

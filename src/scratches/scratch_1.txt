@@ -1,0 +1,62 @@
+import { useState, useEffect, useRef } from 'react'
+import { TextMessage } from '@typings'
+import { io } from 'socket.io-client'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { useInView } from 'react-intersection-observer'
+
+import styles from '../../../styles/scss/Home/Conversation/MessageContainer.module.scss'
+import Message from './Message'
+import CreateMessage from './CreateMessage'
+import { server } from '../../../config/index'
+import { useSocket } from '../../../hooks/useSocket'
+import { ConversationMessages } from '../../../hoc/ConversationMessages'
+
+
+interface Props {
+    messages: any;
+    loading: boolean;
+    activate: boolean;
+    total: number;
+    skip: number;
+}
+
+const MessageContainer = ({ conversationId, myEmail, myUsername, userId }: { conversationId: string, myEmail: string, myUsername: string, userId: string }) => {
+    const scrollRef = useRef<any>(null)
+
+    const [ref, inView, entry] = useInView({
+        threshold: 0.5
+    })
+
+    const { socket } = useSocket({ userId })
+    
+    return (
+        <ConversationMessages conversationId={conversationId} scrollRef={scrollRef} socket={socket} inView={inView}>
+            <>
+                {({ messages, loading, activate, total, skip }: Props) => (
+                        <div className={styles.container}>
+                            <div className={styles.messages_container}>
+                                {(!loading && total >= messages.length && skip < total && !activate) ? <div ref={ref}></div> : <></> }
+                                {messages.length > 0 &&
+                                    <>
+                                        {messages.map((message: TextMessage, key: number, arr: any) => {
+                                            return (
+                                                <div key={key}>
+                                                    <Message key={key} index={myEmail === message.senderEmail ? 2 : 1} text={message.text} date={message.date} senderEmail={message.senderEmail} />
+                                                </div>
+                                            )
+                                        })}
+                                    </>
+                                }
+                                <div ref={scrollRef}></div>
+                            </div>
+                            <CreateMessage socket={socket} userId={userId} conversationId={conversationId} />
+                        </div>
+                    )
+                }
+            </>
+        </ConversationMessages>
+    )
+}
+
+export default MessageContainer;

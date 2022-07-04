@@ -70,3 +70,10 @@
     display: flex;
     flex-flow: column wrap;
 }
+
+
+@media screen and (max-width: 500px) {
+    .mess_container {
+        flex-flow: column nowrap;
+    }
+}

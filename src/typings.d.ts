@@ -3,6 +3,7 @@ export interface TextMessage {
     date: string;
     index: 1 | 2;
     senderEmail: string;
+    media?: string;
 }
 
 export type Section = 'Messages' | 'Social' | 'Profile' | 'None'
