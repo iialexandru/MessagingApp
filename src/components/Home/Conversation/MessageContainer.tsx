@@ -1,38 +1,39 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { TextMessage } from '@typings'
-import { io } from 'socket.io-client'
+import { connect } from 'react-redux'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useInView } from 'react-intersection-observer'
 
 import styles from '../../../styles/scss/Home/Conversation/MessageContainer.module.scss'
-import Message from './Message'
+import Message from './Message' 
 import CreateMessage from './CreateMessage'
 import { server } from '../../../config/index'
 import { useSocket } from '../../../hooks/useSocket'
+import { getInitialMessages, getPreviousMessages, receiveMessage } from '../../../actions/conversationActions'
 
 
-const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewContainer, newContainer }: { conversationId: string, myEmail: string, myUsername: string, userId: string, newContainer: boolean, setNewContainer: Dispatch<SetStateAction<boolean>> }) => {
-    const [ messages, setMessages ] = useState<TextMessage[]>([])
-    const [ peopleIds, setPeopleIds ] = useState<any>([])
-    const [ total, setTotal ] = useState(0)
+const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewContainer, newContainer, _messages, _total, getInitialMessages, getPreviousMessages}: { getInitialMessages: any, getPreviousMessages: any,_messages: any, _total: any, conversationId: string, myEmail: string, myUsername: string, userId: string, newContainer: boolean, setNewContainer: Dispatch<SetStateAction<boolean>> }) => {
+    const messages: any = useMemo<any>(() => _messages[conversationId] ? _messages[conversationId] : [], [ conversationId, _messages ])
+    const total: any = useMemo<any>(() => _total[conversationId] ? _total[conversationId] : 0, [ conversationId, _total ])
+
 
     const scrollRef = useRef<any>(null)
     const [ skip, setSkip ] = useState(0)
 
     const [ loading, setLoading ] = useState(false)
     const [ initialLoading, setInitialLoading ] = useState(false)
+
     const [ref, inView, entry] = useInView({
         threshold: 0.5
     })
-
 
     const [ renderFirstTime, setRenderFirstTime ] = useState(false)
 
     const scrollContainer = useRef<any>(null)
 
-    const { socket } = useSocket({ userId })
+
 
     useEffect(() => {
         const getConversation = async () => {
@@ -40,20 +41,24 @@ const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewC
                 scrollRef.current?.scrollIntoView()
             }, 0)
 
+            const onSuccess = () => {
+                setTimeout(() => {
+                    scrollRef.current?.scrollIntoView()
+                }, 0)
+            }
+
             setSkip(0)
             setInitialLoading(true)
-            const result = (await axios.get(`${server}/api/conversation/show-conversation/${conversationId}?limit=${30}&skip=${0}`, { withCredentials: true })).data
 
-            setMessages(result.messages.reverse())
-            setPeopleIds(result.people.reverse())
-            setTotal(result.total)
+            if(!(messages.length > 0)) {
+                getInitialMessages({ conversationId, onSuccess })
+            }
+
 
             setInitialLoading(false)
             setNewContainer(false)
 
-            setTimeout(() => {
-                scrollRef.current?.scrollIntoView()
-            }, 0)
+      
         }
 
         if(newContainer) {
@@ -61,32 +66,34 @@ const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewC
         }
         
         setLoading(false)
-    }, [ conversationId, skip, newContainer, setNewContainer ])
+    }, [ conversationId, skip, newContainer, setNewContainer, getInitialMessages ])
 
 
-    useEffect(() => {
-        if(socket === null) return;
 
-        socket.on('receive-message', (message: any) => {
-            setMessages([ ...messages, message.message ])
-            setTotal(total => total + 1)
+    // useEffect(() => {
+    //     if(socket === null) return;
 
-            if(message.email === myEmail) {
-                setTimeout(() => {
-                    scrollRef.current?.scrollIntoView()
-                }, 0)
-            }
-        })
+    //     socket.on('receive-message', (message: any) => {
+    //         setMessages([ ...messages, message.message ])
+    //         setTotal(total => total + 1)
+
+    //         if(message.email === myEmail) {
+    //             setTimeout(() => {
+    //                 scrollRef.current?.scrollIntoView()
+    //             }, 0)
+    //         }
+    //     })
 
 
-        return () => {
-            socket.off('receive-message')
-        }
-    }, [ socket, messages ])
+    //     return () => {
+    //         socket.off('receive-message')
+    //     }
+    // }, [ socket, messages ])
 
 
     const [ activate, setActivate ] = useState(false)
 
+    
     useEffect(() => {
         if(!inView || total <= messages.length || skip > total || loading || activate || !messages.length || initialLoading || newContainer || !renderFirstTime) return;
         
@@ -98,20 +105,20 @@ const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewC
             setLoading(true)
             setSkip(skip => skip + 30)  
 
-            const result = (await axios.get(`${server}/api/conversation/show-conversation/${conversationId}?limit=${30}&skip=${_skip}`, { withCredentials: true })).data
-            
-            setMessages([ ...result.messages.reverse(), ...messages ])
-            setPeopleIds([ ...result.people.reverse(), ...peopleIds ])
-            setLoading(false)
+            const onFinish = () => {
+                setLoading(false)
             
 
-            setTimeout(() => {
-                scrollContainer.current?.scrollIntoView()
-            }, 0)
+                setTimeout(() => {
+                    scrollContainer.current?.scrollIntoView()
+                }, 0)
+                
+                setTimeout(() => {
+                    setActivate(false)
+                }, 2000)
+            }
             
-            setTimeout(() => {
-                setActivate(false)
-            }, 2000)
+            getPreviousMessages({ conversationId, skip: _skip, onFinish })
         }
 
         getMoreMessages()
@@ -119,7 +126,9 @@ const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewC
         return () => {
             source.cancel() 
         }
-    }, [ inView, activate, loading, total, initialLoading, newContainer, renderFirstTime ])
+    }, [ inView, activate, loading, _total, initialLoading, newContainer, renderFirstTime, getPreviousMessages ])
+
+    console.log(_messages)
 
     return (
         <div className={styles.container}>
@@ -132,7 +141,7 @@ const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewC
                         <span>Loading...</span>
                     </div>
                 }
-                {(messages.length > 0 && !initialLoading) ?
+                {(messages && messages.length > 0 && !initialLoading) ?
                     <>
                         {messages.map((message: TextMessage, key: number) => {
                             if(key === 29 && messages.length === 30 && !renderFirstTime) {
@@ -166,9 +175,9 @@ const MessageContainer = ({ conversationId, myEmail, myUsername, userId, setNewC
                 }
                 <div ref={scrollRef}></div>
             </div>
-            <CreateMessage socket={socket} userId={userId} conversationId={conversationId} />
+            <CreateMessage userId={userId} conversationId={conversationId} />
         </div>
     )
 }
 
-export default MessageContainer;
+export default connect((state: any) => ({ _messages: state.conversation.messages, _total: state.conversation.total }), { getInitialMessages, getPreviousMessages, receiveMessage })(MessageContainer);

@@ -4,17 +4,30 @@ import { persistReducer } from 'redux-persist'
 
 import authReducer from './authReducer'
 import socialReducer from './socialReducer'
+import conversationReducer from './conversationReducer'
 
-const persistConfig = {
-    key: 'root',
-    storage,
-    // whitelist: [ '' ]
+const authPersistConfig = {
+    key: 'auth',
+    storage
 }
 
+const socialPersistConfig = {
+    key: 'social',
+    storage
+}
+
+//@ts-ignore
+const authPersist = persistReducer(authPersistConfig, authReducer)
+
+//@ts-ignore
+const socialPersist = persistReducer(socialPersistConfig, socialReducer)
 
 const rootReducer = combineReducers({
-    auth: authReducer,
-    social: socialReducer
+    auth: authPersist,
+    social: socialPersist,
+    conversation: conversationReducer
 })
 
-export const persistRootReducer = persistReducer(persistConfig, rootReducer)
+// export const persistRootReducer = persistReducer(persistConfig, rootReducer)
+
+export default rootReducer

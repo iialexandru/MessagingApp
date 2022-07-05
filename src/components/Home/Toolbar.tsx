@@ -7,15 +7,16 @@ import { Section } from '@typings'
 
 interface Props {
     setSection: Dispatch<SetStateAction<Section>>;
+    setNewContainer: Dispatch<SetStateAction<boolean>>;
     section: Section;
 }
 
 
-const Toolbar: FC<Props> = ({ setSection, section }) => {
+const Toolbar: FC<Props> = ({ setSection, section, setNewContainer }) => {
 
     return (
         <div className={styles.container}>
-            <div onClick={() => setSection('Messages')} className={`${section === 'Messages' ? styles.active : ''} ${styles.sec_opt}`}>
+            <div onClick={() => { setNewContainer(true); setSection('Messages');  } } className={`${section === 'Messages' ? styles.active : ''} ${styles.sec_opt}`}>
                 <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655987198/MessagingApp/text-message-4641_ohkmqm.svg' width={30} height={30} alt='Messages' />
             </div>
 

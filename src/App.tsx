@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import Login from './components/Authentication/Login'
 import Register from './components/Authentication/Register'
@@ -10,12 +10,22 @@ import ForgotPasswordComplete from './components/Authentication/ForgotPasswordCo
 import ErrorPage from './components/Layout/ErrorPage'
 import Home from './components/Home/Home'
 import { verifyLogin } from './actions/authActions'
-import { useEffect } from 'react'
+import { useSocket } from './hooks/useSocket'
 
 
-const App = ({ loggedIn, verifyLogin }: { loggedIn: boolean, verifyLogin: any }) => {
+const App = ({ loggedIn, verifyLogin, userId }: { loggedIn: boolean, verifyLogin: any, userId: string }) => {
   const navigate = useNavigate()
   const [ startLoad, setStartLoad ] = useState(false)
+
+  const socket = useSocket()
+
+
+useEffect(() => {
+  if(loggedIn && socket) {
+    socket!.subscribe({ userId })
+  }
+}, [ loggedIn, userId, socket ])
+
 
   useEffect(() => {
     verifyLogin()
@@ -51,4 +61,4 @@ const App = ({ loggedIn, verifyLogin }: { loggedIn: boolean, verifyLogin: any })
   );
 }
 
-export default connect((state: any) => ({ loggedIn: state.auth.loggedIn }), { verifyLogin })(App);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, userId: state.auth.userId }), { verifyLogin })(App);

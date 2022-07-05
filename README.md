@@ -1,1 +1,1 @@
-SITE: https://messaging-ewy8zx31d-fiils.vercel.app
+SITE: https://messaging-app-blue.vercel.app

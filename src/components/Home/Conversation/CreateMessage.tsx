@@ -1,31 +1,26 @@
-import type { FC, Dispatch, SetStateAction } from 'react'
-import { useState, useEffect } from 'react'
+import type { FC } from 'react'
+import { useState } from 'react'
 import { format } from 'date-fns'
-import axios from 'axios'
 
 import styles from '../../../styles/scss/Home/Conversation/MessageContainer.module.scss';
-import { TextMessage } from '@typings'
-import { server } from '../../../config/index'
+import { useSocket } from '../../../hooks/useSocket'
 
 
 interface Props {
     conversationId: string;
     userId: string;
-    socket: any;
 }
 
 
-const CreateMessage: FC<Props> = ({ conversationId, userId, socket }) => {
+const CreateMessage: FC<Props> = ({ conversationId, userId }) => {
     const [ text, setText ] = useState('')
     const [ loading, setLoading ] = useState(false)
     const [ start, setStart ] = useState(false)
 
+    const socket = useSocket()
+
 
     const [ files, setFiles ] = useState<any>([])
-
-    const sendSocketMessage = (text: string, date: string, conversationId: string, userId: string) => {
-        socket.emit('send-message', { text, date, conversationId, userId, files })
-    }
 
     const handleDeleteImage = (e: any, key: number) => {
         e.preventDefault();
@@ -55,9 +50,7 @@ const CreateMessage: FC<Props> = ({ conversationId, userId, socket }) => {
     }
 
 
-
-
-    const sendMessage = async (e: any) => {
+    const sendMessage_ = async (e: any) => {
         e.preventDefault()
 
         const date = format(new Date(), 'dd-MM-yyyy')
@@ -68,7 +61,7 @@ const CreateMessage: FC<Props> = ({ conversationId, userId, socket }) => {
         setLoading(true);
 
         try {
-            sendSocketMessage(text, date, conversationId, userId)
+            socket!.sendMessage({ text, date, conversationId, userId, files })
         } catch (err) {
             console.log(err)
         }
@@ -94,13 +87,13 @@ const CreateMessage: FC<Props> = ({ conversationId, userId, socket }) => {
                 </div>
             }
             <div  className={styles.input_create}> 
-                <input value={text} maxLength={1000} onChange={e => setText(e.target.value)} placeholder="Write a message..." onKeyDown={e => { if(e.key === 'Enter') { sendMessage(e) } }} />
+                <input value={text} maxLength={1000} onChange={e => setText(e.target.value)} placeholder="Write a message..." onKeyDown={e => { if(e.key === 'Enter') { sendMessage_(e) } }} />
                 <label htmlFor='file'>
                     <img src='https://res.cloudinary.com/multimediarog/image/upload/v1656920039/MessagingApp/photos-10608_2_nmxg2p.svg' width={30} height={30} alt='Images' />
                 </label>
                 <input type='file' id='file' name='file' onChange={uploadPhoto} style={{ display: 'none' }} onClick={e => { const target = e.target as HTMLInputElement; target.value = '' } } accept='image/*' />
             </div>
-            <div className={styles.send} onClick={e => sendMessage(e)}>
+            <div className={styles.send} onClick={e => sendMessage_(e)}>
                 <img src='https://res.cloudinary.com/multimediarog/image/upload/v1656149617/MessagingApp/send-4006_ebpjrw.svg' width={25} height={25} alt='Send' />
             </div>
         </div>

@@ -10,11 +10,13 @@ import Toolbar from './Toolbar'
 import MessageContainer from './Conversation/MessageContainer'
 import SocialContainer from './Social/SocialContainer'
 import { server } from '../../config/index'
+import { useSocket } from '../../hooks/useSocket'
+import { receiveMessage, lastMessage } from '../../actions/conversationActions'
 
 import { Section } from '@typings'
 
 
-const Home = ({ username, email, userId }: { username: string, email: string, userId: string }) => {
+const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage, lastMessages }: { lastMessages: any, username: string, email: string, userId: string, receiveMessage: any, _messages: any, lastMessage: any }) => {
     const [ section, setSection ] = useState<Section>('None')
     const [ conversations, setConversations ] = useState<any>(null)
 
@@ -22,8 +24,20 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
     const [ newContainer, setNewContainer ] = useState(false)
 
 
+    const socket = useSocket()
+
+    const receiveMessageProp = ({ conversationId, message }: { conversationId: string, message: string }) => {
+        receiveMessage({ conversationId, message })
+    }
+
+ 
     useEffect(() => {
         const source = axios.CancelToken.source()
+
+        socket!.eventListeners({ receiveMessage: receiveMessageProp, email })
+    
+        lastMessage()
+
         const getConversations = async () => {
             const result = (await axios.get(`${server}/api/conversation/show-conversations`, { withCredentials: true })).data
 
@@ -35,7 +49,8 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
         return () => {
             source.cancel()
         }
-    }, [])
+    }, [ ])
+
 
     return (
         <div className={styles.container}>
@@ -51,13 +66,11 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
                     <div className={styles.section_container}>
                         {conversations && 
                             conversations.map((conversation: any, key: number) => {
-                                let lastMessage = conversation.messages[0] ? (!conversation.messages[conversation.messages.length - 1].text.length ? '<div style="display: flex; alignItems: center; gap: 5px "><img src=\'https://res.cloudinary.com/multimediarog/image/upload/v1656924938/MessagingApp/image-941_nxgiwm.png\' width={20} height={20} alt=\'img\' /> <span>Image</span></div> ' : conversation.messages[conversation.messages.length - 1].text ) : ''
-
                                 return (
                                     !conversation.group ?
-                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={lastMessage} conversationId={conversation._id} globalConversationId={conversationId} setNewContainer={setNewContainer}  />
+                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={lastMessages[conversation._id] ? lastMessages[conversation._id] : ''} conversationId={conversation._id} globalConversationId={conversationId} setNewContainer={setNewContainer}  />
                                     :
-                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} message={''} conversationId={conversation._id} setNewContainer={setNewContainer} globalConversationId={conversationId} />
+                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} message={lastMessages[conversation._id] ? lastMessages[conversation._id] : ''} conversationId={conversation._id} setNewContainer={setNewContainer} globalConversationId={conversationId} />
                                 ) 
                             })
                         }                        
@@ -65,7 +78,7 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
                 </div>
 
                 <div className={styles.replacer}>
-                    <Toolbar setSection={setSection} section={section} />
+                    <Toolbar setSection={setSection} section={section} setNewContainer={setNewContainer} />
                     {(section === 'Messages' && conversationId) && <MessageContainer newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> }
                     {section === 'Social' && <SocialContainer /> }
                 </div>
@@ -74,4 +87,4 @@ const Home = ({ username, email, userId }: { username: string, email: string, us
     )
 }
 
-export default connect((state: any) => ({ email: state.auth.email, username: state.auth.username, userId: state.auth.userId }))(Home);
+export default connect((state: any) => ({ email: state.auth.email, username: state.auth.username, userId: state.auth.userId, _messages: state.conversation.messages, _total: state.conversation.total, lastMessages: state.conversation.lastMessages  }), { receiveMessage, lastMessage })(Home);
