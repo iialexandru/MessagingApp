@@ -4,6 +4,7 @@ export interface TextMessage {
     index: 1 | 2;
     senderEmail: string;
     media?: string;
+    seen?: string;
 }
 
 export type Section = 'Messages' | 'Social' | 'Profile' | 'None'

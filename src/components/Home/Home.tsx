@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { connect } from 'react-redux'
@@ -23,18 +23,27 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
     const [ conversationId, setConversationId ] = useState(null)
     const [ newContainer, setNewContainer ] = useState(false)
 
+    const onMyMessage = ({ senderEmail }: { senderEmail: string }) => {
+        if(email === senderEmail) {
+            setTimeout(() => scrollRef.current?.scrollIntoView(), 0)
+        }
+
+    }
+
+    const scrollRef = useRef<any>(null)
+
 
     const socket = useSocket()
 
-    const receiveMessageProp = ({ conversationId, message }: { conversationId: string, message: string }) => {
-        receiveMessage({ conversationId, message })
+    const receiveMessageProp = ({ conversationId, message, email, userId, finished, id }: { finished: boolean, id: number, email: string, conversationId: string, message: string, userId: string }) => {
+        receiveMessage({ conversationId, message, userId, email, onMyMessage, finished, id })
     }
 
  
     useEffect(() => {
         const source = axios.CancelToken.source()
 
-        socket!.eventListeners({ receiveMessage: receiveMessageProp, email })
+        socket!.eventListeners({ receiveMessage: receiveMessageProp, email, userId })
     
         lastMessage()
 
@@ -66,11 +75,12 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
                     <div className={styles.section_container}>
                         {conversations && 
                             conversations.map((conversation: any, key: number) => {
+
                                 return (
                                     !conversation.group ?
-                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={lastMessages[conversation._id] ? lastMessages[conversation._id] : ''} conversationId={conversation._id} globalConversationId={conversationId} setNewContainer={setNewContainer}  />
+                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} person={conversation.people.filter((chatter: any) => chatter.email !== email)[0]} message={(lastMessages[conversation._id] && lastMessages[conversation._id].message) ? lastMessages[conversation._id].message : ''} seenMessage={lastMessages[conversation._id] ? lastMessages[conversation._id].seen : true} totalUnseen={lastMessages[conversation._id] ? lastMessages[conversation._id].totalUnseen : 0} conversationId={conversation._id} globalConversationId={conversationId} setNewContainer={setNewContainer}  />
                                     :
-                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} message={lastMessages[conversation._id] ? lastMessages[conversation._id] : ''} conversationId={conversation._id} setNewContainer={setNewContainer} globalConversationId={conversationId} />
+                                        <MessSection key={key} setConversationId={setConversationId} setSection={setSection} myUsername={username} myEmail={email} message={lastMessages[conversation._id].message ? lastMessages[conversation._id].message : ''} seenMessage={lastMessages[conversation._id] ? lastMessages[conversation._id].seen : true} totalUnseen={lastMessages[conversation._id] ? lastMessages[conversation._id].totalUnseen : 0} conversationId={conversation._id} setNewContainer={setNewContainer} globalConversationId={conversationId} />
                                 ) 
                             })
                         }                        
@@ -79,7 +89,7 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
 
                 <div className={styles.replacer}>
                     <Toolbar setSection={setSection} section={section} setNewContainer={setNewContainer} />
-                    {(section === 'Messages' && conversationId) && <MessageContainer newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> }
+                    {(section === 'Messages' && conversationId) && <MessageContainer scrollRef={scrollRef} globalConversationId={conversationId} newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> }
                     {section === 'Social' && <SocialContainer /> }
                 </div>
             </div>

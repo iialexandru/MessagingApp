@@ -49,13 +49,18 @@
 }
 
 .loader_container {
+    position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-flow: column nowrap;
+    right: 0; 
+    left: 0;
+    text-align: center;
     color: rgb(200, 200, 200);
     gap: .2em;
     font-family: 'Baloo Bhai 2';
+    width: 100%;
     
     span {
         margin-right: -10px;
@@ -63,11 +68,11 @@
 }
 
 .loader {
-    border: 16px solid #f3f3f3;
-    border-top: 16px solid #7f7f7f;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #7f7f7f;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 5px;
+    height: 5px;
     animation: spin 2s linear infinite;
 }
 
@@ -78,13 +83,13 @@
 
 
 .messages_container {
+    position: relative;
     display: flex;
     flex-flow: column nowrap;
     gap: 1em;
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    height: calc(100% - 90px);
     padding-bottom: 10px;
     padding-right: 4px;
 }

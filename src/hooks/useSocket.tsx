@@ -19,17 +19,16 @@ export const useSocketInit = () => {
     }
 
 
-    const eventListeners = async ({ receiveMessage, email }: { receiveMessage: ({ conversationId, message, email }: { conversationId: string, message: string, email: string }) => void, email: string }) => {
+    const eventListeners = async ({ receiveMessage, email, userId }: { userId: string, receiveMessage: any, email: string }) => {
         if(!socket) return;
-
-        socket.on('receive-message', ({ message, conversationId }: { message: string, conversationId: string }) => {
-
-            receiveMessage({ message, conversationId, email })
+        
+        socket.on('receive-message', ({ message, conversationId, finished, id }: { id: number, senderEmail: string, message: string, conversationId: string, finished: boolean }) => {
+            receiveMessage({ message, conversationId, email, userId, id, finished })
         })
     }
-
-    const sendMessage = ({ text, date, conversationId, userId, files }: { text: string, date: string, conversationId: string, userId: string, files: string[] }) => {
-        socket.emit('send-message', { text, date, conversationId, userId, files })
+    
+    const sendMessage = ({ text, date, conversationId, userId, files, id }: { id: number, text: string, date: string, conversationId: string, userId: string, files: string[] }) => {
+        socket.emit('send-message', { text, date, conversationId, userId, files, id })
     }
 
     const unsubscribe = () => {

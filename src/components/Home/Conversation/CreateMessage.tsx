@@ -9,10 +9,13 @@ import { useSocket } from '../../../hooks/useSocket'
 interface Props {
     conversationId: string;
     userId: string;
+    addNotReadyMessage: any;
+    deleteNotReadyMessage: any;
+    myEmail: string;
 }
 
 
-const CreateMessage: FC<Props> = ({ conversationId, userId }) => {
+const CreateMessage: FC<Props> = ({ conversationId, userId, addNotReadyMessage, myEmail, deleteNotReadyMessage }) => {
     const [ text, setText ] = useState('')
     const [ loading, setLoading ] = useState(false)
     const [ start, setStart ] = useState(false)
@@ -59,12 +62,15 @@ const CreateMessage: FC<Props> = ({ conversationId, userId }) => {
         setStart(true)
 
         setLoading(true);
+        addNotReadyMessage({ conversationId, id: 1, text, date, email: myEmail, media: files })
+
 
         try {
-            socket!.sendMessage({ text, date, conversationId, userId, files })
+            socket!.sendMessage({ text, date, conversationId, userId, files, id: 1 })
         } catch (err) {
             console.log(err)
         }
+
 
         setFiles([])
         setText('')
@@ -72,7 +78,7 @@ const CreateMessage: FC<Props> = ({ conversationId, userId }) => {
         setStart(false)
     }
 
-    return (
+    return ( 
         <div className={styles.tooltext}>
             {Boolean(files.length) && 
                 <div className={styles.container_images}>
@@ -91,7 +97,7 @@ const CreateMessage: FC<Props> = ({ conversationId, userId }) => {
                 <label htmlFor='file'>
                     <img src='https://res.cloudinary.com/multimediarog/image/upload/v1656920039/MessagingApp/photos-10608_2_nmxg2p.svg' width={30} height={30} alt='Images' />
                 </label>
-                <input type='file' id='file' name='file' onChange={uploadPhoto} style={{ display: 'none' }} onClick={e => { const target = e.target as HTMLInputElement; target.value = '' } } accept='image/*' />
+                {!loading && <input type='file' id='file' name='file' onChange={uploadPhoto} style={{ display: 'none' }} onClick={e => { const target = e.target as HTMLInputElement; target.value = '' } } accept='image/*' /> }
             </div>
             <div className={styles.send} onClick={e => sendMessage_(e)}>
                 <img src='https://res.cloudinary.com/multimediarog/image/upload/v1656149617/MessagingApp/send-4006_ebpjrw.svg' width={25} height={25} alt='Send' />
