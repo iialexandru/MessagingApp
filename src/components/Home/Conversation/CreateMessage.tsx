@@ -10,17 +10,35 @@ interface Props {
     conversationId: string;
     userId: string;
     addNotReadyMessage: any;
-    deleteNotReadyMessage: any;
     myEmail: string;
+    scrollRef: any;
+    nrMessages: any;
 }
 
 
-const CreateMessage: FC<Props> = ({ conversationId, userId, addNotReadyMessage, myEmail, deleteNotReadyMessage }) => {
+const CreateMessage: FC<Props> = ({ conversationId, userId, addNotReadyMessage, myEmail, scrollRef, nrMessages }) => {
     const [ text, setText ] = useState('')
     const [ loading, setLoading ] = useState(false)
     const [ start, setStart ] = useState(false)
 
     const socket = useSocket()
+
+    const createIdForMessage = () => {
+        let uniqueId = 0 
+
+        if(nrMessages) {
+            uniqueId = nrMessages.length
+
+            for(let i = 0; i < nrMessages.length; i++) {
+                if(uniqueId === nrMessages[i].messageId) {
+                    uniqueId += 1
+                    i = 0
+                }
+            }
+        }
+
+        return uniqueId
+    }
 
 
     const [ files, setFiles ] = useState<any>([])
@@ -62,11 +80,17 @@ const CreateMessage: FC<Props> = ({ conversationId, userId, addNotReadyMessage, 
         setStart(true)
 
         setLoading(true);
-        addNotReadyMessage({ conversationId, id: 1, text, date, email: myEmail, media: files })
+        setTimeout(() => {
+            scrollRef.current?.scrollIntoView()
+        }, 0)
 
+        const msgId = createIdForMessage()
+
+        addNotReadyMessage({ conversationId, id: msgId, text, date, email: myEmail, media: files })
+        
 
         try {
-            socket!.sendMessage({ text, date, conversationId, userId, files, id: 1 })
+            socket!.sendMessage({ text, date, conversationId, userId, files, id: msgId })
         } catch (err) {
             console.log(err)
         }

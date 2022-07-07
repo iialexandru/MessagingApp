@@ -2,11 +2,12 @@ import axios from 'axios'
 
 import { CONVERSATION_ACTIONS } from '../reducers/conversationReducer'
 import { server } from '../config/index'
+import { useSocket } from '../hooks/useSocket'
 
 
 export const getInitialMessages = ({ conversationId, onSuccess, onGettingMessages, totalUnseen }: { totalUnseen: number, onGettingMessages: () => void, conversationId: string, onSuccess: () => void }) => async (dispatch: any) => {
     try {
-        const result = (await axios.get(`${server}/api/conversation/show-conversation/${conversationId}?limit=${10}&skip=${0}&add=${totalUnseen || 0}`, { withCredentials: true })).data
+        const result = (await axios.get(`${server}/api/conversation/show-conversation/${conversationId}?limit=${100}&skip=${0}&add=${totalUnseen || 0}`, { withCredentials: true })).data
 
         dispatch({
             type: CONVERSATION_ACTIONS.GET_INITIAL_MESSAGES,
@@ -18,14 +19,14 @@ export const getInitialMessages = ({ conversationId, onSuccess, onGettingMessage
         console.log(err)
     }
 
-        onGettingMessages()
+    onGettingMessages()
 }
 
 
 
 export const getPreviousMessages = ({ conversationId, skip, onFinish }: { conversationId: string, skip: number, onFinish: () => void }) => async (dispatch: any) => {
     try {
-        const result = (await axios.get(`${server}/api/conversation/show-conversation/${conversationId}?limit=${10}&skip=${skip}`, { withCredentials: true })).data
+        const result = (await axios.get(`${server}/api/conversation/show-conversation/${conversationId}?limit=${100}&skip=${skip}`, { withCredentials: true })).data
 
         dispatch({
             type: CONVERSATION_ACTIONS.GET_PREVIOUS_MESSAGES,
@@ -41,16 +42,15 @@ export const getPreviousMessages = ({ conversationId, skip, onFinish }: { conver
     onFinish()
 }
 
-export const receiveMessage = ({ conversationId, message, email, userId, onMyMessage, id, finished }: { id: number, finished: boolean, onMyMessage: ({ senderEmail }: { senderEmail: string }) => void, conversationId: string, message: any, email: string, userId: string }) => async (dispatch: any) => {
+export const receiveMessage = ({ conversationId, message, email, userId, onMyMessage, id, finished, senderEmail }: { senderEmail: string, id: number, finished: boolean, onMyMessage: ({ senderEmail }: { senderEmail: string }) => void, conversationId: string, message: any, email: string, userId: string }) => async (dispatch: any) => {
     try {
         dispatch({
             type: CONVERSATION_ACTIONS.RECEIVE_NEW_MESSAGE,
             payload: { id: conversationId, newMessage: message, userId, email }
         })
 
-        onMyMessage({ senderEmail: email })
+        onMyMessage({ senderEmail })
 
-        console.log(finished, id)
         if(finished) {
             dispatch({
                 type: CONVERSATION_ACTIONS.DELETE_NR_MESSAGE,
@@ -79,7 +79,7 @@ export const lastMessage = () => async (dispatch: any) => {
 }
 
 
-export const seeMessage = ({ conversationId, messageId }: { messageId: string, conversationId: string }) => async (dispatch: any) => {
+export const seeMessage = ({ conversationId, messageId, seenEmail, messageSeenByOther }: { messageSeenByOther: any,  messageId: string, conversationId: string, seenEmail: string }) => async (dispatch: any) => {
     try {
         dispatch({
             type: CONVERSATION_ACTIONS.SEEN_LAST_MESSAGE,
@@ -93,6 +93,20 @@ export const seeMessage = ({ conversationId, messageId }: { messageId: string, c
         dispatch({
             type: CONVERSATION_ACTIONS.LAST_MESSAGE,
             payload: { data: result.newConversations }
+        })
+
+        messageSeenByOther({ conversationId, seenEmail })
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
+export const seenMessageByOther = ({ conversationId }: { conversationId: string }) => async (dispatch: any) => {
+    try {
+        dispatch({
+            type: CONVERSATION_ACTIONS.OTHER_SEEN_LAST_MESSAGE,
+            payload: { conversationId }
         })
     } catch (err) {
         console.log(err)

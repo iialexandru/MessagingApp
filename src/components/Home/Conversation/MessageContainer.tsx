@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import { TextMessage } from '@typings'
 import { connect } from 'react-redux'
 import axios from 'axios'
+import { useSocket } from '../../../hooks/useSocket'
 import { useInView } from 'react-intersection-observer'
 
 import styles from '../../../styles/scss/Home/Conversation/MessageContainer.module.scss'
@@ -18,10 +19,8 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
     const alreadyUnseenRef = useRef<any>(null)
 
 
-    console.log(nrMessages, nrMessagesLoadings)
-
-
     const [ skip, setSkip ] = useState(0)
+
 
     const [ loading, setLoading ] = useState(false)
     const [ initialLoading, setInitialLoading ] = useState(false)
@@ -30,13 +29,18 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
         threshold: 0.5
     })
 
+
     const [ altRef, altInView ] = useInView({
         threshold: 0.9
     })
     
+    const socket = useSocket()
+    
+    console.log(altInView && conversationId === globalConversationId && messages[messages.length - 1] && !(messages[messages.length - 1].seen.includes(userId)))
     useEffect(() => {
         if(altInView && conversationId === globalConversationId && messages[messages.length - 1] && !(messages[messages.length - 1].seen.includes(userId))) {
-            seeMessage({ conversationId, messageId: messages[messages.length - 1]._id })
+            console.log('yes')
+            seeMessage({ conversationId, messageId: messages[messages.length - 1]._id, seenEmail: myEmail, messageSeenByOther: socket!.messageSeenByOther })
         }
     }, [ altInView, globalConversationId, conversationId, seeMessage, messages ])
 
@@ -74,7 +78,7 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
     
             }
 
-            if(!(messages.length > 0)) {
+            if(!(messages.length > 0) && lastMessages[conversationId]) {
                 setSkip(0)
                 setInitialLoading(true)
 
@@ -101,10 +105,10 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
         const source = axios.CancelToken.source()
 
         const getMoreMessages = async () => {
-            const _skip = skip + 10 
+            const _skip = skip + 100 
             setActivate(true)
             setLoading(true)
-            setSkip(skip => skip + 10)  
+            setSkip(skip => skip + 100)  
 
             const onFinish = () => {
                 setLoading(false)
@@ -150,7 +154,7 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
                             messages.forEach((m: any, key: number) => { if(m.senderEmail !== myEmail) { lastIndex = key } })
 
                             return (
-                                <div key={key} ref={(key === 9 && skip > 0) ? scrollContainer : ((key === lastIndex && !(message.seen!.includes(userId))) ? altRef : ((key === 10 && lastMessages[conversationId].totalUnseen > 0) ? alreadyUnseenRef : null))}>
+                                <div key={key} ref={(key === 99 && skip > 0) ? scrollContainer : ((key === lastIndex && !(message.seen!.includes(userId))) ? altRef : ((key === 99 && lastMessages[conversationId].totalUnseen > 0) ? alreadyUnseenRef : null))}>
                                     <Message key={key} index={myEmail === message.senderEmail ? 2 : 1} text={message.text} date={message.date} senderEmail={message.senderEmail} media={message.media ? message.media : ''} />
                                 </div>
                             )
@@ -174,9 +178,26 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
                     }
                 </>
                 }
+                {(nrMessagesLoadings[conversationId] && nrMessagesLoadings[conversationId][0] && nrMessagesLoadings[conversationId][0].active) ? 
+                    <div className={styles.status_message}>
+                        <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657179756/MessagingApp/Spinner-1s-200px_4_ds6f4r.svg' width={30} height={30} alt='SVG' />
+                        <span>Loading message</span>
+                    </div>
+                :
+                    (messages && messages[messages.length - 1] && messages[messages.length - 1].senderEmail === myEmail && !lastMessages[conversationId].seenByOther) ?
+                        <div className={styles.status_message}>
+                            <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657179865/MessagingApp/send-4006_7_ny9rbr.svg' width={15} height={15} alt='Sent' />
+                            <span>Sent</span>
+                        </div>
+                    : (messages && messages[messages.length - 1] && messages[messages.length - 1].senderEmail === myEmail && lastMessages[conversationId].seenByOther) &&
+                        <div className={styles.status_message}>
+                            <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657193483/MessagingApp/check-mark-3279_1_ecanzu.svg' width={15} height={15} alt='Seen' />
+                            <span>Seen</span>
+                        </div>
+                }
                 <div ref={scrollRef}></div>
             </div>
-            <CreateMessage userId={userId} conversationId={conversationId} addNotReadyMessage={addNotReadyMessage} myEmail={myEmail} deleteNotReadyMessage={deleteNotReadyMessage} />
+            <CreateMessage nrMessages={nrMessages[conversationId]} userId={userId} conversationId={conversationId} addNotReadyMessage={addNotReadyMessage} myEmail={myEmail} scrollRef={scrollRef} />
         </div>
     )
 }

@@ -81,6 +81,14 @@
     100% { transform: rotate(360deg); }
 }
 
+.status_message {
+    display: flex;
+    align-items: center;
+    font-family: 'Baloo Bhai 2';
+    color: darken(white, 30);
+    gap: .3em;
+    height: 1.5rem;
+}
 
 .messages_container {
     position: relative;
@@ -90,7 +98,6 @@
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    padding-bottom: 10px;
     padding-right: 4px;
 }
 

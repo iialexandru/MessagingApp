@@ -1,6 +1,6 @@
 @import '../../variables';
 
-.section {
+.section, .skeleton_section {
     height: 90px;
     border-bottom: 1px solid $gray;
     display: flex;
@@ -17,6 +17,13 @@
     }
 }
 
+@keyframes pulsating {
+    0% { background-color: rgb(200, 200, 200); }
+    100% { background-color: rgb(225, 225, 225); }
+}
+
+
+
 .active_section {
     background-color: rgb(220, 220, 220);
 }
@@ -25,7 +32,7 @@
     background-color: rgb(220, 220, 220);
 }
 
-.info {
+.info, .skeleton_info {
     display: flex;
     flex-flow: column wrap;
     gap: .6em;
@@ -48,5 +55,33 @@
         font-family: sans-serif;
         color: rgb(200, 200, 200);
         width: 240px;
+    }
+}
+
+.skeleton_img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgb(200, 200, 200);
+    animation: pulsating 1s infinite alternate linear;
+}
+
+.skeleton_info {
+    gap: 1.4em;
+
+    span[id='name'] {
+        height: 7px;
+        width: 90px;
+        background-color: rgb(200, 200, 200);
+        border-radius: 20px;
+        animation: pulsating 1s infinite alternate linear;
+    }
+
+    span[id='message'] {
+        height: 10px;
+        width: 150px;
+        background-color: rgb(200, 200, 200);
+        border-radius: 20px;
+        animation: pulsating 1s infinite alternate linear;
     }
 }

@@ -13,7 +13,8 @@ export enum CONVERSATION_ACTIONS {
     LAST_MESSAGE = 'LAST_MESSAGE',
     SEEN_LAST_MESSAGE = 'SEEN_LAST_MESSAGE',
     ADD_NR_MESSAGE = 'ADD_NR_MESSAGE',
-    DELETE_NR_MESSAGE = 'DELETE_NR_MESSAGE'
+    DELETE_NR_MESSAGE = 'DELETE_NR_MESSAGE',
+    OTHER_SEEN_LAST_MESSAGE = 'OTHER_SEEN_LAST_MESSAGE',
 }
 
 
@@ -31,7 +32,7 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
                 ...state,
                 messages: (state.messages[ action.payload.id ] && state.messages[ action.payload.id ].length > 0) ? { ...state.messages, [ action.payload.id ]: [ ...state.messages[ action.payload.id ], action.payload.newMessage ] } : { ...state.messages },
                 total: { ...state.total, [ action.payload.id ]: state.total[ action.payload.id ] + 1 },
-                lastMessages: { ...state.lastMessages, [ action.payload.id ]: { message: action.payload.newMessage.text, seen: action.payload.newMessage.seen.includes(action.payload.userId) ? true : false, totalUnseen: (action.payload.email !== action.payload.newMessage.senderEmail) ? (state.lastMessages[ action.payload.id ].totalUnseen || 0) + 1 : state.lastMessages[ action.payload.id ].totalUnseen } }
+                lastMessages: { ...state.lastMessages, [ action.payload.id ]: { message: action.payload.newMessage.text, seen: action.payload.newMessage.seen.includes(action.payload.userId) ? true : false, totalUnseen: (action.payload.email !== action.payload.newMessage.senderEmail) ? (state.lastMessages[ action.payload.id ].totalUnseen || 0) + 1 : state.lastMessages[ action.payload.id ].totalUnseen, seenByOther: false } }
             }
         }
         case CONVERSATION_ACTIONS.GET_PREVIOUS_MESSAGES: {
@@ -43,7 +44,7 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
         case CONVERSATION_ACTIONS.LAST_MESSAGE: {
             const obj: any = {}
 
-            action.payload.data.forEach((mess: { id: string, message: string, seen: boolean, totalUnseen: number }) => obj[mess.id] = { message: mess.message, seen: mess.seen, totalUnseen: mess.totalUnseen })
+            action.payload.data.forEach((mess: { id: string, message: string, seen: boolean, totalUnseen: number, seenByOther: boolean }) => obj[mess.id] = { message: mess.message, seen: mess.seen, totalUnseen: mess.totalUnseen, seenByOther: mess.seenByOther })
 
             return {
                 ...state,
@@ -73,15 +74,13 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
                 },
                 nrMessagesLoadings: { ...state.nrMessagesLoadings, [ action.payload.conversationId ]: 
                     (state.nrMessagesLoadings[ action.payload.conversationId ] && state.nrMessagesLoadings[ action.payload.conversationId ].length > 0) ? [ 
-                        ...state.nrMessagesLoadings[action.payload.conversationId], { 
+                        ...state.nrMessagesLoadings[ action.payload.conversationId ], { 
                             active: true, messageId: action.payload.id 
                         } 
                     ]  : [
-                        [
                             { 
-                            active: true, messageId: action.payload.id 
-                            } 
-                        ]
+                                active: true, messageId: action.payload.id 
+                            }
                     ]
                 }
             }
@@ -94,7 +93,7 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
             
             Object.keys(state.nrMessages).forEach((conv: any) => {
                 if(conv === action.payload.conversationId && state.nrMessages[ conv ]) {
-                    state.nrMessages[ conv ].forEach((m: any) =>  { 
+                    state.nrMessages[ conv ].forEach((m: any) =>  {
                         if(m.messageId !== action.payload.id) {     
                                     objM[ conv ] = (objM[ conv ] && objM[ conv ].length > 0) ? [ ...objM[ conv ], m ] : [ m ] 
                                 } 
@@ -109,8 +108,8 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
             
             Object.keys(state.nrMessagesLoadings).forEach((conv: any) => {
                     if(conv === action.payload.conversationId && state.nrMessagesLoadings[ conv ]) {
-                            state.nrMessagesLoadings[ conv ].forEach((m: any) =>  { 
-                                if(m.messageId !== action.payload.id) {     
+                            state.nrMessagesLoadings[ conv ].forEach((m: any) =>  {
+                                if(m.messageId !== action.payload.id) {    
                                     objM[ conv ] = (objM[ conv ] && objM[ conv ].length > 0) ? [ ...objM[ conv ], m ] : [ m ] 
                                 } 
                             } 
@@ -120,11 +119,16 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
                     }
                 }
             )
-                        
             return {
                 ...state,
                 nrMessages: objM,
-                nrMessagesLoadings: { ...objL }
+                nrMessagesLoadings: objL
+            }
+        }
+        case CONVERSATION_ACTIONS.OTHER_SEEN_LAST_MESSAGE: {
+            return {
+                ...state,
+                lastMessages: { ...state.lastMessages, [ action.payload.conversationId ]: { ...state.lastMessages[ action.payload.conversationId ], seenByOther: true } }
             }
         }
         default: {
