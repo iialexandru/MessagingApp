@@ -49,7 +49,7 @@ export const receiveMessage = ({ conversationId, message, email, userId, onMyMes
             payload: { id: conversationId, newMessage: message, userId, email }
         })
 
-        // onMyMessage({ senderEmail })
+        onMyMessage({ senderEmail })
 
         if(finished) {
             dispatch({

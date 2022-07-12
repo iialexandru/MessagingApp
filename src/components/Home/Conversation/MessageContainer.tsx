@@ -17,10 +17,6 @@ const MessageContainer: FC<MessageContainerProps> = ({ mcRef, addNotReadyMessage
     const messages: any = useMemo<any>(() => _messages[conversationId] ? _messages[conversationId] : [], [ conversationId, _messages ])
     const total: any = useMemo<any>(() => _total[conversationId] ? _total[conversationId] : 0, [ conversationId, _total ])
 
-    useEffect(() => {
-        console.log(messages)
-    }, [ messages ])
-
     const alreadyUnseenRef = useRef<any>(null)
 
     const [ skip, setSkip ] = useState(0)

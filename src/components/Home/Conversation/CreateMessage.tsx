@@ -94,6 +94,7 @@ const CreateMessage: FC<CreateMessageProps> = ({ conversationId, userId, addNotR
         setText('')
         setLoading(false)
         setStart(false)
+        
     }
 
     return ( 
