@@ -85,3 +85,19 @@
         animation: pulsating 1s infinite alternate linear;
     }
 }
+
+@media screen and (max-width: 699px) {
+    .section {
+        max-width: 100%;
+    }
+
+    .info {
+        span[id='name'] {
+            width: min(45vw, 170px);
+        }
+    
+        span[id='message'] {
+            width: max(55vw, 200px);
+        }
+    }
+}

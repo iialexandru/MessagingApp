@@ -57,13 +57,13 @@
 
 .value {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     padding-inline: 1em;
     font-family: 'Baloo Bhai 2';
     font-weight: 600;
     font-size: 1.2rem;
     width: 100%;
+    gap: 1em;
     padding-block: .4em;
     background-color: rgb(250, 250, 250);
 
@@ -93,12 +93,36 @@
             opacity: .8;
         }
     }
+
+    @include Scrollbar;
+
+    ::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    span {
+        width: min(16vw, 230px);
+        overflow-x: auto;
+    }
 }
 
 .up_list, .down_list {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.up_list {
+    @include Scrollbar;
+
+    ::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    span {
+        width: min(18vw, 230px);
+        overflow-x: auto;
+    }
 }
 
 .down_list {
@@ -163,4 +187,13 @@
 
 .none {
     font-family: 'Oxygen Mono';
+}
+
+
+@media screen and (max-width: 699px) {
+    .friends_container {
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.875rem);
+        }
+    }
 }

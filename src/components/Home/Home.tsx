@@ -11,12 +11,15 @@ import { useSocket } from '../../hooks/useSocket'
 import { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation } from '../../actions/conversationActions'
 import SkeletonMessSection from '../../components/Home/Conversation/SkeletonMessSection'
 import Cover from '../../components/Home/Cover'
+import useWindowSize from '../../utils/useWindowSize'
 
 import { Section } from '@typings'
 
 
 const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage, lastMessages, seenMessageByOther, getConversations, conversations, removeConversation, addConversation }: { addConversation: any, removeConversation: any, conversations: any, getConversations: any, seenMessageByOther: any, lastMessages: any, username: string, email: string, userId: string, receiveMessage: any, _messages: any, lastMessage: any }) => {
     const [ section, setSection ] = useState<Section>('Messages')
+
+    const [ width ] = useWindowSize()
 
     const [ conversationId, setConversationId ] = useState<string | null>(null)
     const [ newContainer, setNewContainer ] = useState(false)
@@ -93,60 +96,78 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
                             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655985142/MessagingApp/Messages-icon_spndmi.png' width={35} height={35} alt='logo' />
                             <h2>Messager</h2>
                         </div>
+
+                        {(width <= 699 && conversationId) ?
+                            <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657630110/MessagingApp/curved-arrow-2264_gavulg.svg' onClick={() => { setConversationId(null) }} width={30} height={30} alt='Back' />
+                         : (width <= 699 && !conversationId) &&
+                            <img src='https://res.cloudinary.com/multimediarog/image/upload/v1656246252/MessagingApp/team-5701_1_uqv9wx.svg' onClick={() => { setConversationId(null); setSection('Social') }} width={30} height={30} alt='Messages' />
+                        }
                     </div>
 
-                    <div className={styles.section_container}>
-                        {conversations && 
-                            conversations.map((conversation: any, key: number) => {
-                                return (
-                                    !conversation.group ?
-                                        <MessSection key={key} 
-                                                     setConversationId={setConversationId} 
-                                                     setSection={setSection} 
-                                                     myUsername={username} 
-                                                     myEmail={email} 
-                                                     person={conversation.people ? conversation.people.filter((chatter: any) => chatter.email !== email)[0] : ''} 
-                                                     message={(lastMessages[conversation._id] && lastMessages[conversation._id].message) ? lastMessages[conversation._id].message : ''} 
-                                                     seenMessage={lastMessages[conversation._id] ? lastMessages[conversation._id].seen : true} 
-                                                     totalUnseen={lastMessages[conversation._id] ? lastMessages[conversation._id].totalUnseen : 0} 
-                                                     conversationId={conversation._id} 
-                                                     globalConversationId={conversationId} 
-                                                     setNewContainer={setNewContainer}  />
-                                    :
-                                        <MessSection key={key} 
-                                                     setConversationId={setConversationId} 
-                                                     setSection={setSection} 
-                                                     myUsername={username} 
-                                                     myEmail={email} 
-                                                     message={(lastMessages[conversation._id] && lastMessages[conversation._id].message) ? lastMessages[conversation._id].message : ''} 
-                                                     seenMessage={lastMessages[conversation._id] ? lastMessages[conversation._id].seen : true} 
-                                                     totalUnseen={lastMessages[conversation._id] ? lastMessages[conversation._id].totalUnseen : 0} 
-                                                     conversationId={conversation._id} 
-                                                     setNewContainer={setNewContainer} 
-                                                     globalConversationId={conversationId} />
-                                ) 
-                            })
-                        }      
-                        {loading &&
-                            <>
-                                <SkeletonMessSection />               
-                                <SkeletonMessSection />               
-                                <SkeletonMessSection />               
-                                <SkeletonMessSection />   
-                            </>
-                        }            
-                    </div>
+                        {((!conversationId && width <= 699 && section !== 'Social') || width > 699) &&
+                            <div className={styles.section_container}>
+                                {conversations && 
+                                    conversations.map((conversation: any, key: number) => {
+                                        return (
+                                            !conversation.group ?
+                                                <MessSection key={key} 
+                                                            setConversationId={setConversationId} 
+                                                            setSection={setSection} 
+                                                            myUsername={username} 
+                                                            myEmail={email} 
+                                                            person={conversation.people ? conversation.people.filter((chatter: any) => chatter.email !== email)[0] : ''} 
+                                                            message={(lastMessages[conversation._id] && lastMessages[conversation._id].message) ? lastMessages[conversation._id].message : ''} 
+                                                            seenMessage={lastMessages[conversation._id] ? lastMessages[conversation._id].seen : true} 
+                                                            totalUnseen={lastMessages[conversation._id] ? lastMessages[conversation._id].totalUnseen : 0} 
+                                                            conversationId={conversation._id} 
+                                                            globalConversationId={conversationId} 
+                                                            setNewContainer={setNewContainer}  />
+                                            :
+                                                <MessSection key={key} 
+                                                            setConversationId={setConversationId} 
+                                                            setSection={setSection} 
+                                                            myUsername={username} 
+                                                            myEmail={email} 
+                                                            message={(lastMessages[conversation._id] && lastMessages[conversation._id].message) ? lastMessages[conversation._id].message : ''} 
+                                                            seenMessage={lastMessages[conversation._id] ? lastMessages[conversation._id].seen : true} 
+                                                            totalUnseen={lastMessages[conversation._id] ? lastMessages[conversation._id].totalUnseen : 0} 
+                                                            conversationId={conversation._id} 
+                                                            setNewContainer={setNewContainer} 
+                                                            globalConversationId={conversationId} />
+                                        ) 
+                                    })
+                                }      
+                                {loading &&
+                                    <>
+                                        <SkeletonMessSection />               
+                                        <SkeletonMessSection />               
+                                        <SkeletonMessSection />               
+                                        <SkeletonMessSection />   
+                                    </>
+                                }            
+                            </div>
+                        }
+                        
+                        {(conversationId && width <= 699 && section === 'Messages') &&
+                            <MessageContainer blocked={conversations.filter((conv: any) => conv._id === conversationId)[0] ? conversations.filter((conv: any) => conv._id === conversationId)[0].blocked : false} mcRef={mcRef} scrollRef={scrollRef} globalConversationId={conversationId} newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> 
+                        }
+
+                        {(!conversationId && width <= 699 && section === 'Social') &&
+                            <SocialContainer setConversationId={setConversationId} />
+                        }
                 </div>
 
-                <div className={styles.replacer}>
-                    <Toolbar setSection={setSection} section={section} setNewContainer={setNewContainer} />
-                    {(section === 'Messages' && conversationId) ? 
-                        <MessageContainer blocked={conversations.filter((conv: any) => conv._id === conversationId)[0] ? conversations.filter((conv: any) => conv._id === conversationId)[0].blocked : false} mcRef={mcRef} scrollRef={scrollRef} globalConversationId={conversationId} newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> 
-                    : (section === 'Messages' && !conversationId) && 
-                        <Cover />
-                    }
-                    {section === 'Social' && <SocialContainer setConversationId={setConversationId} /> }
-                </div>
+                {width >= 699 &&
+                    <div className={styles.replacer}>
+                        <Toolbar setSection={setSection} section={section} setNewContainer={setNewContainer} />
+                        {(section === 'Messages' && conversationId) ? 
+                            <MessageContainer blocked={conversations.filter((conv: any) => conv._id === conversationId)[0] ? conversations.filter((conv: any) => conv._id === conversationId)[0].blocked : false} mcRef={mcRef} scrollRef={scrollRef} globalConversationId={conversationId} newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> 
+                        : (section === 'Messages' && !conversationId) && 
+                            <Cover />
+                        }
+                        {section === 'Social' && <SocialContainer setConversationId={setConversationId} /> }
+                    </div>
+                }
             </div>
         </div>
     )

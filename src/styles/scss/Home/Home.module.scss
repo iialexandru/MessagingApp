@@ -25,10 +25,10 @@
 }
 
 .mess_container {
-    width: 65vw;
-    height: 85vh;
-    max-height: 1000px;
-    max-width: 1500px;
+    width: 85vw;
+    height: min(85vh, 650px);
+    max-height: 800px;
+    max-width: 1000px;
     border: 3px solid $gray;
     border-radius: 10px;
     background-color: #E9E9E9;
@@ -83,8 +83,23 @@
 }
 
 
-@media screen and (max-width: 500px) {
+@media screen and (min-width: 699px) and (max-width: 1024px) {
+    .section_container {
+        width: 250px;
+    }
+}
+
+@media screen and (max-width: 699px) {
     .mess_container {
         flex-flow: column nowrap;
+        width: max(75vw, 250px);
+    }
+
+    .section_container {
+        width: 100%;
+    }
+
+    .header {
+        height: 70px;
     }
 }

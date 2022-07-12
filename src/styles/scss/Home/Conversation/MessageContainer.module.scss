@@ -7,7 +7,7 @@
     position: relative;
     font-family: sans-serif;
     border-radius: 20px;
-    max-width: max(50%, 250px);
+    max-width: max(50%, 170px);
     width: 200px;
     width: fit-content;
     padding-inline: 1em;
@@ -15,6 +15,16 @@
     word-wrap: break-all;
     word-break: break-word;
     transition: background-color .25s;
+
+    p {
+        font-size: clamp(.9rem, 2.5vw, 1rem);
+    }
+
+    img {
+        position: relative;
+        right: 10px;
+        width: 285px;
+    }
 }
 
 @keyframes pulsating {
@@ -98,7 +108,7 @@
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 4px;
+    padding-right: 8px;
 }
 
 .activated_message_gray {
@@ -205,5 +215,59 @@
 
     &:hover {
         opacity: .9;
+    }
+}
+
+@media screen and (min-width: 699px) and (max-width: 1024px) {
+    .messages_container {
+        padding-right: 10px;
+    }
+
+    .message img {
+        right: 16px;
+        image-orientation: from-image;
+        min-width: 250px;
+        max-width: 250px;
+        height: 280px;
+        position: relative;
+    }
+}
+
+@media screen and (min-width: 699px) and (max-width: 736px) {
+    .message img {
+        min-width: 230px;
+        max-width: 230px;;
+        height: 220px;
+        right: 0;
+    }
+}
+
+@media screen and (max-width: 699px) {
+    .container {
+        height: 80vh;
+        justify-content: revert;
+    }
+
+    .messages_container {
+        height: 59vh;
+    }
+
+    .tooltext {
+        height: auto;
+        width: 100%;
+        padding-inline: 0;
+    }
+
+    .message img {
+        right: 0;
+        image-orientation: from-image;
+        min-width: 163px;
+        max-width: 163px;
+        height: 180px;
+        position: relative;
+    }
+
+    .container_images {
+        width: 100%;
     }
 }
