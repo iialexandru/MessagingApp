@@ -6,6 +6,7 @@ import { blockFriend, unblockFriend, removeFriend, updateFriends } from '../../.
 import { removeConversation } from '../../../../actions/conversationActions'
 import { useSocket } from '../../../../hooks/useSocket'
 import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.scss';
+import useWindowSize from '../../../../utils/useWindowSize'
 
 
 interface Item {
@@ -25,11 +26,13 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
     const [ active, setActive ]  = useState<boolean>(false)
 
     const [ loading, setLoading ] = useState(false)
+
+    const [ width ] = useWindowSize()
     
     const socket = useSocket()
 
     const onSuccess = () => {
-        // updateFriends({})
+       return;
     }
 
     const remFrCallback = ({ conversationId }: { conversationId: string }) => {
@@ -88,11 +91,17 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
     return (
         <div className={styles.friend}>
             <div className={styles.up_list}>
-                <span>{email}</span>
-                <span>{name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655985701/MessagingApp/man_5-512_esb1fi.webp' width={40} height={40} alt='Profile' />
+                    <span>{name}</span>
+                </div>
                 <img onClick={() => setActive(!active)} style={{ transform: active ? 'rotate(0deg)' : 'rotate(180deg)' }} src='https://res.cloudinary.com/multimediarog/image/upload/v1656250600/MessagingApp/arrow-down-3101_5_rdoajz.svg' width={30} height={25} alt='Arrow' />
             </div>
+
+            <div className={styles.mq_email}><span>{email}</span></div>
+            
             <div className={`${styles.down_list} ${!active ? styles.close : ''}`}>
+                
                 {!blocked ?
                     <>
                         {!loading ?

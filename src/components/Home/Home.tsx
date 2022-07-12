@@ -97,14 +97,14 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
                             <h2>Messager</h2>
                         </div>
 
-                        {(width <= 699 && conversationId) ?
-                            <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657630110/MessagingApp/curved-arrow-2264_gavulg.svg' onClick={() => { setConversationId(null) }} width={30} height={30} alt='Back' />
-                         : (width <= 699 && !conversationId) &&
+                        {((width < 800 && conversationId) || (width < 800 && section === 'Social')) ?
+                            <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657630110/MessagingApp/curved-arrow-2264_gavulg.svg' onClick={() => { setConversationId(null); setSection('Messages') }} width={30} height={30} alt='Back' />
+                         : (width < 800 && !conversationId) &&
                             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1656246252/MessagingApp/team-5701_1_uqv9wx.svg' onClick={() => { setConversationId(null); setSection('Social') }} width={30} height={30} alt='Messages' />
                         }
                     </div>
 
-                        {((!conversationId && width <= 699 && section !== 'Social') || width > 699) &&
+                        {((!conversationId && width < 800 && section !== 'Social') || width >= 800) &&
                             <div className={styles.section_container}>
                                 {conversations && 
                                     conversations.map((conversation: any, key: number) => {
@@ -137,6 +137,7 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
                                         ) 
                                     })
                                 }      
+
                                 {loading &&
                                     <>
                                         <SkeletonMessSection />               
@@ -148,16 +149,16 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
                             </div>
                         }
                         
-                        {(conversationId && width <= 699 && section === 'Messages') &&
+                        {(conversationId && width < 800 && section === 'Messages') &&
                             <MessageContainer blocked={conversations.filter((conv: any) => conv._id === conversationId)[0] ? conversations.filter((conv: any) => conv._id === conversationId)[0].blocked : false} mcRef={mcRef} scrollRef={scrollRef} globalConversationId={conversationId} newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> 
                         }
 
-                        {(!conversationId && width <= 699 && section === 'Social') &&
+                        {(!conversationId && width < 800 && section === 'Social') &&
                             <SocialContainer setConversationId={setConversationId} />
                         }
                 </div>
 
-                {width >= 699 &&
+                {width >= 800 &&
                     <div className={styles.replacer}>
                         <Toolbar setSection={setSection} section={section} setNewContainer={setNewContainer} />
                         {(section === 'Messages' && conversationId) ? 

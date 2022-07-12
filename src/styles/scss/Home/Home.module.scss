@@ -22,6 +22,8 @@
 .section_container {
     width: 320px;
     overflow-y: auto;
+
+    @include Scrollbar;
 }
 
 .mess_container {
@@ -83,16 +85,17 @@
 }
 
 
-@media screen and (min-width: 699px) and (max-width: 1024px) {
+@media screen and (min-width: 800px) and (max-width: 1024px) {
     .section_container {
         width: 250px;
     }
 }
 
-@media screen and (max-width: 699px) {
+@media screen and (max-width: 800px) {
     .mess_container {
         flex-flow: column nowrap;
-        width: max(75vw, 250px);
+        width: max(90vw, 250px);
+        max-width: 550px;
     }
 
     .section_container {

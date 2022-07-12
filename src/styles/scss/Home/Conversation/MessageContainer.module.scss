@@ -7,7 +7,7 @@
     position: relative;
     font-family: sans-serif;
     border-radius: 20px;
-    max-width: max(50%, 170px);
+    max-width: max(50%, 180px);
     width: 200px;
     width: fit-content;
     padding-inline: 1em;
@@ -109,6 +109,9 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 8px;
+
+    @include Scrollbar;
+
 }
 
 .activated_message_gray {
@@ -176,7 +179,7 @@
     top: -100px;
     height: 95px;
     width: calc(100% - 7.6em);
-    overflow-x: scroll;
+    overflow-x: auto;
     display: flex;
     align-items: center;
     gap: 1em;
@@ -218,7 +221,7 @@
     }
 }
 
-@media screen and (min-width: 699px) and (max-width: 1024px) {
+@media screen and (min-width: 800px) and (max-width: 1024px) {
     .messages_container {
         padding-right: 10px;
     }
@@ -233,7 +236,7 @@
     }
 }
 
-@media screen and (min-width: 699px) and (max-width: 736px) {
+@media screen and (min-width: 800px) and (max-width: 736px) {
     .message img {
         min-width: 230px;
         max-width: 230px;;
@@ -242,10 +245,11 @@
     }
 }
 
-@media screen and (max-width: 699px) {
+@media screen and (max-width: 800px) {
     .container {
         height: 80vh;
         justify-content: revert;
+        padding-inline: 1em;
     }
 
     .messages_container {

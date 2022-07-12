@@ -6,6 +6,7 @@ import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.s
 import { acceptFriendRequest, rejectFriendRequest, showFriendRequests } from '../../../../actions/socialActions'
 import { addConversation } from '../../../../actions/conversationActions'
 import { useSocket } from '../../../../hooks/useSocket'
+import useWindowSize from '../../../../utils/useWindowSize'
 
 
 interface Props {
@@ -22,6 +23,8 @@ interface Props {
 const Request: FC<Props> = ({ name, email, acceptFriendRequest, rejectFriendRequest, showFriendRequests, setFriendRequests, addConversation }) => {
 
     const [ loading, setLoading ] = useState(false)
+
+    const [ width ] = useWindowSize()
  
     const socket = useSocket()
 
@@ -62,8 +65,14 @@ const Request: FC<Props> = ({ name, email, acceptFriendRequest, rejectFriendRequ
 
     return (
         <div className={styles.value}>
-            <span>{email}</span>
-            <span>{name}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655985701/MessagingApp/man_5-512_esb1fi.webp' width={40} height={40} alt='Profile' />
+                <span id='name'>{name}</span>
+            </div>
+
+            <div className={styles.mq_email}>
+                <span>{email} ask doia sid h</span>
+            </div> 
 
             <div className={styles.buttons}>
                 {!loading ?

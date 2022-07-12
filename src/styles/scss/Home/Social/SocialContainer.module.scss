@@ -6,7 +6,8 @@
 .container {
     justify-content: flex-start;
     padding-top: 0;
-    padding-inline: 0;
+    width: 100%;
+    // padding-inline: 0;
 }
 
 .tools {
@@ -29,7 +30,7 @@
 }
 
 .friends_container {
-    padding-inline: 30px;
+    // padding-inline: 30px;
     box-sizing: border-box;
     overflow: hidden;
 
@@ -101,7 +102,7 @@
     }
 
     span {
-        width: min(16vw, 230px);
+        width: max(40vw, 70%);
         overflow-x: auto;
     }
 }
@@ -120,7 +121,7 @@
     }
 
     span {
-        width: min(18vw, 230px);
+        width: min(24vw, 230px);
         overflow-x: auto;
     }
 }
@@ -187,13 +188,65 @@
 
 .none {
     font-family: 'Oxygen Mono';
+
+    h2 {
+        font-size: clamp(1rem, 2.5vw, 1.875rem);
+    }
 }
 
 
-@media screen and (max-width: 699px) {
-    .friends_container {
-        h2 {
-            font-size: clamp(1.2rem, 3vw, 1.875rem);
+@media screen and (max-width: 800px) {
+    .container {
+        height: calc(100% - 70px);
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .down_list button {
+        // padding-inline: .5em;
+
+        &:hover {
+            opacity: .9;
         }
+
+        &:active {
+            opacity: .8;
+        }
+    }
+
+    .tools {
+        img[id='arrow']:hover {
+            cursor: pointer;
+            background-color: revert;
+        }
+    }
+}
+
+.mq_email {
+    margin-left: 46px;
+    width: min(56vw, 80%);
+    white-space: nowrap;
+    overflow-x: auto;
+
+    @include Scrollbar;
+}
+
+.value {
+    flex-flow: column;
+    gap: 0;
+}
+
+.buttons {
+    margin-top: 20px;
+    justify-content: space-around;
+}
+@media screen and (max-width: 800px) {
+    
+    .container {
+        padding-inline: 0;
+    }
+
+    .friends_container {
+        padding-inline: 30px;
     }
 }

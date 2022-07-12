@@ -1,7 +1,6 @@
 import type { FC } from 'react'
 import { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
-import { useDebounce } from 'use-debounce'
 
 import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.scss';
 import Friend from './Friend'
@@ -14,9 +13,9 @@ const Friends: FC<Omit<SocialRedux, 'peopleSearch' | 'psLoading' | 'showPeopleSe
     const allFriends = friends
     const [ _friends, setFriends ] = useState<any>(allFriends)
 
+
     useEffect(() => {
         resetPeopleSearch({})
-        // updateFriends({})
     }, [ resetPeopleSearch, updateFriends ])
 
     useEffect(() => {
@@ -57,7 +56,6 @@ const Friends: FC<Omit<SocialRedux, 'peopleSearch' | 'psLoading' | 'showPeopleSe
         setFriends(newFriends)
     }, [ search ])
 
-    // const [ value ] = useDebounce(_friends, 200)
     
     return (
         <div className={styles.friends_container}>
