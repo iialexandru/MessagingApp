@@ -1,23 +1,27 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import type { Dispatch, SetStateAction } from 'react'
+import type { FC } from 'react'
 import { TextMessage } from '@typings'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import { useSocket } from '../../../hooks/useSocket'
 import { useInView } from 'react-intersection-observer'
+import { MessageContainerProps } from '@typings'
 
 import styles from '../../../styles/scss/Home/Conversation/MessageContainer.module.scss'
 import Message from './Message' 
 import CreateMessage from './CreateMessage'
-import { getInitialMessages, getPreviousMessages, receiveMessage, lastMessage, seeMessage, addNotReadyMessage, deleteNotReadyMessage } from '../../../actions/conversationActions'
+import { getInitialMessages, getPreviousMessages, receiveMessage, lastMessage, seeMessage, addNotReadyMessage } from '../../../actions/conversationActions'
 
 
-const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, globalConversationId, conversationId, myEmail, myUsername, userId, setNewContainer, newContainer, _messages, _total, getInitialMessages, getPreviousMessages, seeMessage, scrollRef, lastMessages, deleteNotReadyMessage }: { deleteNotReadyMessage: any, nrMessages: any, nrMessagesLoadings: any, lastMessages: any, scrollRef: any, globalConversationId: string, seeMessage: any, getInitialMessages: any, getPreviousMessages: any,_messages: any, _total: any, conversationId: string, myEmail: string, myUsername: string, userId: string, newContainer: boolean, setNewContainer: Dispatch<SetStateAction<boolean>>, addNotReadyMessage: any }) => {
+const MessageContainer: FC<MessageContainerProps> = ({ mcRef, addNotReadyMessage, nrMessages, nrMessagesLoadings, globalConversationId, conversationId, myEmail, myUsername, userId, setNewContainer, newContainer, _messages, _total, getInitialMessages, getPreviousMessages, seeMessage, scrollRef, lastMessages, blocked }) => {
     const messages: any = useMemo<any>(() => _messages[conversationId] ? _messages[conversationId] : [], [ conversationId, _messages ])
     const total: any = useMemo<any>(() => _total[conversationId] ? _total[conversationId] : 0, [ conversationId, _total ])
 
-    const alreadyUnseenRef = useRef<any>(null)
+    useEffect(() => {
+        console.log(messages)
+    }, [ messages ])
 
+    const alreadyUnseenRef = useRef<any>(null)
 
     const [ skip, setSkip ] = useState(0)
 
@@ -36,11 +40,10 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
     
     const socket = useSocket()
     
-    console.log(altInView && conversationId === globalConversationId && messages[messages.length - 1] && !(messages[messages.length - 1].seen.includes(userId)))
+
     useEffect(() => {
-        if(altInView && conversationId === globalConversationId && messages[messages.length - 1] && !(messages[messages.length - 1].seen.includes(userId))) {
-            console.log('yes')
-            seeMessage({ conversationId, messageId: messages[messages.length - 1]._id, seenEmail: myEmail, messageSeenByOther: socket!.messageSeenByOther })
+        if(altInView && conversationId === globalConversationId && messages[messages.length - 1] && (!(messages[messages.length - 1].seen.includes(userId)) || !(messages[0].seen.includes(userId)))) {
+            seeMessage({ conversationId, messageId: !(messages[messages.length - 1].seen.includes(userId)) ? messages[messages.length - 1]._id : messages[0]._id , seenEmail: myEmail, messageSeenByOther: socket!.messageSeenByOther })
         }
     }, [ altInView, globalConversationId, conversationId, seeMessage, messages ])
 
@@ -99,6 +102,7 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
     const [ activate, setActivate ] = useState(false)
 
 
+
     useEffect(() => {
         if(!inView || total <= messages.length || skip > total || loading || activate || !messages.length || initialLoading || newContainer || !renderFirstTime) return;
         
@@ -136,8 +140,8 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
     return (
         <div className={styles.container}>
 
-            <div className={styles.messages_container}>
-                {(!loading && total >= messages.length && skip < total && !activate && messages.length && !initialLoading && renderFirstTime) ? <div ref={ref}>asdhajsdv</div> : <></> }
+            <div className={styles.messages_container} ref={mcRef}> 
+                {(!loading && total >= messages.length && skip < total && !activate && messages.length && !initialLoading && renderFirstTime && messages.length >= 100) ? <div ref={ref}></div> : <></> }
                 {loading && 
                     <div className={styles.loader_container}>
                         <div className={styles.loader}></div>
@@ -154,7 +158,7 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
                             messages.forEach((m: any, key: number) => { if(m.senderEmail !== myEmail) { lastIndex = key } })
 
                             return (
-                                <div key={key} ref={(key === 99 && skip > 0) ? scrollContainer : ((key === lastIndex && !(message.seen!.includes(userId))) ? altRef : ((key === 99 && lastMessages[conversationId].totalUnseen > 0) ? alreadyUnseenRef : null))}>
+                                <div key={key} ref={(key === 99 && skip > 0) ? scrollContainer : ((key === lastIndex && !(message.seen!.includes(userId))) ? altRef : ((lastMessages[conversationId].totalUnseen > 0 && key === messages.length - lastMessages[conversationId].totalUnseen - 1) ? alreadyUnseenRef : null))}>
                                     <Message key={key} index={myEmail === message.senderEmail ? 2 : 1} text={message.text} date={message.date} senderEmail={message.senderEmail} media={message.media ? message.media : ''} />
                                 </div>
                             )
@@ -197,9 +201,9 @@ const MessageContainer = ({ addNotReadyMessage, nrMessages, nrMessagesLoadings, 
                 }
                 <div ref={scrollRef}></div>
             </div>
-            <CreateMessage nrMessages={nrMessages[conversationId]} userId={userId} conversationId={conversationId} addNotReadyMessage={addNotReadyMessage} myEmail={myEmail} scrollRef={scrollRef} />
+            <CreateMessage blocked={blocked} nrMessages={nrMessages[conversationId]} userId={userId} conversationId={conversationId} addNotReadyMessage={addNotReadyMessage} myEmail={myEmail} scrollRef={scrollRef} />
         </div>
     )
 }
 
-export default connect((state: any) => ({ _messages: state.conversation.messages, _total: state.conversation.total, lastMessages: state.conversation.lastMessages, nrMessages: state.conversation.nrMessages, nrMessagesLoadings: state.conversation.nrMessagesLoadings }), { getInitialMessages, getPreviousMessages, receiveMessage, lastMessage, seeMessage, addNotReadyMessage, deleteNotReadyMessage })(MessageContainer);
+export default connect((state: any) => ({ _messages: state.conversation.messages, _total: state.conversation.total, lastMessages: state.conversation.lastMessages, nrMessages: state.conversation.nrMessages, nrMessagesLoadings: state.conversation.nrMessagesLoadings }), { getInitialMessages, getPreviousMessages, receiveMessage, lastMessage, seeMessage, addNotReadyMessage })(MessageContainer);

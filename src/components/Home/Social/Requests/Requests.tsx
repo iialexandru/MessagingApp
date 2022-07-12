@@ -1,21 +1,28 @@
+import type { FC } from 'react'
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.scss';
 import Request from './Request'
 import { resetPeopleSearch, showFriendRequests } from '../../../../actions/socialActions'
+import { SocialRedux } from '@typings'
 
 
-const Requests = ({ resetPeopleSearch, showFriendRequests, friendRequests, loading }: { resetPeopleSearch: (dispatch: any) => void, showFriendRequests: (dispatch: any) => void, friendRequests: any, loading: true  }) => {
+const Requests: FC<Omit<SocialRedux, 'peopleSearch' | 'updateFriends' | 'psLoading' | 'friends' | 'showPeopleSearch' | 'setConversationId'>> = ({ resetPeopleSearch, showFriendRequests, friendRequests, loading }) => {
     const [ search, setSearch ] = useState('')
-    const [ _friendRequests, setFriendRequests ] = useState(friendRequests)
+
+    const allFriendRequests = friendRequests
+    const [ _friendRequests, setFriendRequests ] = useState(allFriendRequests)
 
     useEffect(() => {
-        resetPeopleSearch({})
-    }, [ resetPeopleSearch ])
+        if(allFriendRequests) {
+            setFriendRequests(allFriendRequests)
+        }
+    }, [ allFriendRequests ])
 
     useEffect(() => {
-        showFriendRequests({})
+        showFriendRequests()
+        resetPeopleSearch()
     }, [])
 
     useEffect(() => {
@@ -60,7 +67,7 @@ const Requests = ({ resetPeopleSearch, showFriendRequests, friendRequests, loadi
                                 {_friendRequests.map((person: { email: string, username: string}, key: number) => {
                                     return (
                                         <div key={key} className={styles.values}>
-                                            <Request  email={person.email} name={person.username} />
+                                            <Request setFriendRequests={setFriendRequests}  email={person.email} name={person.username} />
                                         </div>
                                     )
                                 })}

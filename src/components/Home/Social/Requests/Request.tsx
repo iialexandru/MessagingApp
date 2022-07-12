@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 
 import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.scss';
 import { acceptFriendRequest, rejectFriendRequest, showFriendRequests } from '../../../../actions/socialActions'
+import { addConversation } from '../../../../actions/conversationActions'
+import { useSocket } from '../../../../hooks/useSocket'
 
 
 interface Props {
@@ -12,15 +14,28 @@ interface Props {
     acceptFriendRequest: (dispatch: any) => void;
     rejectFriendRequest: (dispatch: any) => void;
     showFriendRequests: (dispatch: any) => void;
+    setFriendRequests: (dispatch?: any) => void;
+    addConversation: any;
 }
 
 
-const Request: FC<Props> = ({ name, email, acceptFriendRequest, rejectFriendRequest, showFriendRequests }) => {
+const Request: FC<Props> = ({ name, email, acceptFriendRequest, rejectFriendRequest, showFriendRequests, setFriendRequests, addConversation }) => {
 
     const [ loading, setLoading ] = useState(false)
+ 
+    const socket = useSocket()
 
     const onSuccess = () => {
         showFriendRequests({})
+        setFriendRequests((friendRequests: any) => friendRequests.filter((fr: any) => fr.email !== email))
+    }
+
+    const acceptedRequestCallback = ({ conversation }: { conversation: any }) => {
+        const onAdded = () => {
+            socket!.addNewConversation({ conversation })
+        }
+
+        addConversation({ conversation, onAdded })
     }
 
     const accept = (e: any) => {
@@ -28,7 +43,7 @@ const Request: FC<Props> = ({ name, email, acceptFriendRequest, rejectFriendRequ
 
         setLoading(true)
 
-        acceptFriendRequest({ email, onSuccess })
+        acceptFriendRequest({ email, onSuccess, acceptedRequestCallback })
         
         setLoading(false)
     }
@@ -64,4 +79,4 @@ const Request: FC<Props> = ({ name, email, acceptFriendRequest, rejectFriendRequ
     )
 }
 
-export default connect((state: any) => ({  }), { acceptFriendRequest, rejectFriendRequest, showFriendRequests })(Request);
+export default connect((state: any) => ({  }), { acceptFriendRequest, rejectFriendRequest, showFriendRequests, addConversation })(Request);

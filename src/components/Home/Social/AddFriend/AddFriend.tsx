@@ -1,15 +1,21 @@
+import type { FC } from 'react'
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux';
 import { useDebounce } from 'use-debounce'
 
 import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.scss';
 import SearchItem from './SearchItem';
-import { showPeopleSearch, resetPeopleSearch} from '../../../../actions/socialActions';
+import { showPeopleSearch, resetPeopleSearch, updateFriends } from '../../../../actions/socialActions';
+import { SocialRedux } from '@typings'
 
 
-const AddFriend = ({ peopleSearch, showPeopleSearch, psLoading, resetPeopleSearch }: { peopleSearch: any, showPeopleSearch: (dispatch: any) => void, psLoading: boolean, resetPeopleSearch: (dispatch: any) => void }) => {
+const AddFriend: FC<Omit<SocialRedux, 'friends' | 'loading' | 'showFriendRequests' | 'friendRequests' | 'setConversationId'>> = ({ peopleSearch, showPeopleSearch, psLoading, resetPeopleSearch, updateFriends }) => {
     const [ search, setSearch ] = useState('')
+    const [ value ] = useDebounce(peopleSearch, 400)
 
+    useEffect(() => {
+        updateFriends({})
+    }, [ updateFriends ])
     
     useEffect(() => {
         showPeopleSearch({ email: search })
@@ -20,14 +26,15 @@ const AddFriend = ({ peopleSearch, showPeopleSearch, psLoading, resetPeopleSearc
         resetPeopleSearch({})
     }
 
+
     return (
         <div className={styles.friends_container}>
             <input value={search} onChange={e => { setSearch(e.target.value);  } } />
-            {(peopleSearch && parseInt(peopleSearch.length) > 0) &&
+            {(value && parseInt(value.length) > 0 && Boolean(search.length)) &&
                 <>
                     {!psLoading ?
                             <>
-                                {peopleSearch.map((person: { email: string, username: string}, key: number) => {
+                                {value.map((person: { email: string, username: string}, key: number) => {
                                     return (
                                         <div key={key} className={styles.values}>
                                             <SearchItem  onSuccess={onSuccess} email={person.email} name={person.username} />
@@ -44,7 +51,7 @@ const AddFriend = ({ peopleSearch, showPeopleSearch, psLoading, resetPeopleSearc
 
             }
             
-            {(!peopleSearch || parseInt(peopleSearch.length) === 0) &&
+            {(!value || parseInt(value.length) === 0 || !Boolean(search.length)) &&
                 <div className={styles.none}>
                     <h2>No results found</h2>
                 </div>
@@ -53,4 +60,4 @@ const AddFriend = ({ peopleSearch, showPeopleSearch, psLoading, resetPeopleSearc
     )
 }
 
-export default connect((state: any) => ({ peopleSearch: state.social.peopleSearch, psLoading: state.social.psLoading }), { showPeopleSearch, resetPeopleSearch })(AddFriend);
+export default connect((state: any) => ({ peopleSearch: state.social.peopleSearch, psLoading: state.social.psLoading }), { showPeopleSearch, resetPeopleSearch, updateFriends })(AddFriend);

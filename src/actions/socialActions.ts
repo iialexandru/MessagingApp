@@ -34,7 +34,7 @@ export const defaultState = () => async (dispatch: any) => {
 }
 
 
-export const addFriend = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
+export const addFriend = ({ email, onSuccess  }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
     try {
         (await axios.post(`${server}/api/social/add-friend`, { email }, { withCredentials: true }))
 
@@ -45,11 +45,20 @@ export const addFriend = ({ email, onSuccess }: { email: string, onSuccess: () =
     }
 }
 
-export const removeFriend = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
+export const removeFriend = ({ email, onSuccess, remFrCallback, onRemoveFriend }: { onRemoveFriend: any, email: string, onSuccess: () => void, remFrCallback: ({ conversationId }: { conversationId: string }) => void }) => async (dispatch: any) => {
     try {
-        (await axios.post(`${server}/api/social/remove-friend`, { email }, { withCredentials: true }))
+        const result = (await axios.post(`${server}/api/social/remove-friend`, { email }, { withCredentials: true })).data
+
+        dispatch({
+            type: SOCIAL_ACTIONS.REMOVE_FRIEND,
+            payload: { email }
+        })
 
         onSuccess()
+        
+        onRemoveFriend({ conversationId: result.conversationId })
+
+        remFrCallback({ conversationId: result.conversationId })
     } catch (err) {
         console.log(err)
     }
@@ -76,18 +85,20 @@ export const showFriendRequests = () => async (dispatch: any) => {
     })
 }
 
-export const acceptFriendRequest = ({ email, onSuccess }: { email: string, onSuccess: () => void}) => async (dispatch: any) => {
+export const acceptFriendRequest = ({ email, onSuccess, acceptedRequestCallback }: { email: string, onSuccess: () => void, acceptedRequestCallback: any }) => async (dispatch: any) => {
     try {
-        (await axios.post(`${server}/api/social/accept-request`, { email }, { withCredentials: true }))
+        const result = (await axios.post(`${server}/api/social/accept-request`, { email }, { withCredentials: true })).data
 
         onSuccess()
         updateFriends()
+
+        acceptedRequestCallback({ conversation: result.conversation })
     } catch (err) {
         console.log(err)
     }
 }
 
-export const rejectFriendRequest = ({ email, onSuccess }: { email: string, onSuccess: () => void}) => async (dispatch: any) => {
+export const rejectFriendRequest = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
     try {
         (await axios.post(`${server}/api/social/reject-request`, { email }, { withCredentials: true }))
 
@@ -132,10 +143,8 @@ export const resetPeopleSearch = () => (dispatch: any) => {
 
 
 export const blockFriend = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
-    console.log("I'll block");
     try {
         await axios.post(`${server}/api/social/block-friend`, { email }, { withCredentials: true })
-        console.log("I'll call onSucces", onSuccess);
 
         onSuccess()
     } catch (err) {

@@ -16,11 +16,11 @@ const socialPersistConfig = {
     storage
 }
 
-//@ts-ignore
+
 const authPersist = persistReducer(authPersistConfig, authReducer)
 
-//@ts-ignore
 const socialPersist = persistReducer(socialPersistConfig, socialReducer)
+
 
 const rootReducer = combineReducers({
     auth: authPersist,

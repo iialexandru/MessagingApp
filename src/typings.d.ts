@@ -7,7 +7,7 @@ export interface TextMessage {
     seen?: string;
 }
 
-export type Section = 'Messages' | 'Social' | 'Profile' | 'None'
+export type Section = 'Messages' | 'Social' | 'None'
 
 export interface AuthPropsReducer {
     loggedIn: boolean;
@@ -59,4 +59,65 @@ export type initialValues = {
         code: string;
         confirmPassword: string;
     }
+}
+
+export interface MessageContainerProps {
+    mcRef: any, 
+    nrMessages: any, 
+    nrMessagesLoadings: any, 
+    lastMessages: any, 
+    scrollRef: any, 
+    globalConversationId: string, 
+    seeMessage: any, 
+    getInitialMessages: any, 
+    getPreviousMessages: any,
+    _messages: any, 
+    _total: any, 
+    conversationId: string, 
+    myEmail: string, 
+    myUsername: string, 
+    userId: string, 
+    newContainer: boolean, 
+    setNewContainer: Dispatch<SetStateAction<boolean>>, 
+    addNotReadyMessage: any;
+    blocked: boolean;
+} 
+
+export interface CreateMessageProps {
+    conversationId: string;
+    userId: string;
+    addNotReadyMessage: any;
+    myEmail: string;
+    scrollRef: any;
+    nrMessages: any;
+    blocked: boolean;
+}
+
+
+export interface MessSectionProps {
+    setSection: Dispatch<SetStateAction<Section>>;
+    myUsername: string;
+    myEmail: string;
+    person?: any;
+    message: string;
+    conversationId: string;
+    setConversationId: Dispatch<SetStateAction<any>>
+    setNewContainer: Dispatch<SetStateAction<boolean>>
+    globalConversationId: string | null;
+    seenMessage: boolean;
+    totalUnseen: number;
+}
+
+ 
+export interface SocialRedux {
+    peopleSearch: any;
+    updateFriends: any; 
+    psLoading: boolean; 
+    loading: boolean;
+    friends: any; 
+    showPeopleSearch: any; 
+    resetPeopleSearch: any;
+    showFriendRequests: any; 
+    friendRequests: any;
+    setConversationId: Dispatch<SetStateAction<string | null>>
 }

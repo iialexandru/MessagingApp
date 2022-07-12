@@ -3,7 +3,8 @@ const INITIAL_STATE = {
     total: {},
     lastMessages: {},
     nrMessages: {},
-    nrMessagesLoadings: {}
+    nrMessagesLoadings: {},
+    conversations: []
 }
 
 export enum CONVERSATION_ACTIONS {
@@ -15,6 +16,9 @@ export enum CONVERSATION_ACTIONS {
     ADD_NR_MESSAGE = 'ADD_NR_MESSAGE',
     DELETE_NR_MESSAGE = 'DELETE_NR_MESSAGE',
     OTHER_SEEN_LAST_MESSAGE = 'OTHER_SEEN_LAST_MESSAGE',
+    GET_CONVERSATIONS = 'GET_CONVERSATIONS',
+    ADD_CONVERSATION = 'ADD_CONVERSATION',
+    REMOVE_CONVERSATION = 'REMOVE_CONVERSATION',
 }
 
 
@@ -28,11 +32,32 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
             }
         }
         case CONVERSATION_ACTIONS.RECEIVE_NEW_MESSAGE: {
+            const olderConversations = state.conversations.filter((conv: any) => conv._id !== action.payload.id)
+            const newestConv = state.conversations.filter((conv: any) => conv._id === action.payload.id)[0]
+            const {email, newMessage: {senderEmail}} = action.payload
+
+            let totalUnseen
+            if(email !== senderEmail){
+                // const hasMessages = Object.keys(state.lastMessages).some((p: any) => { console.log(p, action.payload.id); return p === action.payload.id })
+                totalUnseen = (state.lastMessages?.[ action.payload.id ]?.totalUnseen || 0) + 1
+            } else {
+                totalUnseen =  state.lastMessages?.[ action.payload.id ]?.totalUnseen || 0
+            }
+            const lastMessages = { ...state.lastMessages}
+
+            lastMessages[ action.payload.id ] = { 
+                message: action.payload.newMessage.text, 
+                seen: !!action.payload.newMessage.seen.includes(action.payload.userId), 
+                totalUnseen,
+                 seenByOther: false 
+            }
+
             return {
                 ...state,
-                messages: (state.messages[ action.payload.id ] && state.messages[ action.payload.id ].length > 0) ? { ...state.messages, [ action.payload.id ]: [ ...state.messages[ action.payload.id ], action.payload.newMessage ] } : { ...state.messages },
+                messages:{ ...state.messages, [ action.payload.id ]: state.messages?.[ action.payload.id ] ? [ ...state.messages?.[ action.payload.id ], action.payload.newMessage ] : [action.payload.newMessage] },
                 total: { ...state.total, [ action.payload.id ]: state.total[ action.payload.id ] + 1 },
-                lastMessages: { ...state.lastMessages, [ action.payload.id ]: { message: action.payload.newMessage.text, seen: action.payload.newMessage.seen.includes(action.payload.userId) ? true : false, totalUnseen: (action.payload.email !== action.payload.newMessage.senderEmail) ? (state.lastMessages[ action.payload.id ].totalUnseen || 0) + 1 : state.lastMessages[ action.payload.id ].totalUnseen, seenByOther: false } }
+                lastMessages,
+                conversations: [ newestConv, ...olderConversations ]
             }
         }
         case CONVERSATION_ACTIONS.GET_PREVIOUS_MESSAGES: {
@@ -129,6 +154,28 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
             return {
                 ...state,
                 lastMessages: { ...state.lastMessages, [ action.payload.conversationId ]: { ...state.lastMessages[ action.payload.conversationId ], seenByOther: true } }
+            }
+        }
+        case CONVERSATION_ACTIONS.GET_CONVERSATIONS: {
+            return {
+                ...state,
+                conversations: action.payload.conversations
+            }
+        }
+        case CONVERSATION_ACTIONS.ADD_CONVERSATION: {
+            const newConversations = [ ...state.conversations, action.payload.conversation ]
+
+            return {
+                ...state,
+                conversations: newConversations
+            }
+        }
+        case CONVERSATION_ACTIONS.REMOVE_CONVERSATION: {
+            const newConversations = state.conversations.filter((conv: any) => conv._id !== action.payload.conversationId)
+
+            return {
+                ...state,
+                conversations: newConversations
             }
         }
         default: {

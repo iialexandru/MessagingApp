@@ -18,10 +18,12 @@ export enum SOCIAL_ACTIONS {
     PEOPLE_SEARCH_STOP_LOADING = 'PEOPLE_SEARCH_STOP_LOADING',
     GET_FRIEND_REQUESTS = 'GET_FRIEND_REQUESTS',
     FRIENDS = 'FRIENDS',
+    REMOVE_FRIEND = 'REMOVE_FRIEND',
+    BLOCK_SITUATION = 'BLOCK_SITUATION',
 }
 
 
-const reducer = (state = INITIAL_VALUES, action: any) => {
+const reducer: any = (state = INITIAL_VALUES, action: any) => {
     switch(action.type) {
         case SOCIAL_ACTIONS.DEFAULT_STATE: {
             return {
@@ -83,6 +85,14 @@ const reducer = (state = INITIAL_VALUES, action: any) => {
             return {
                 ...state,
                 peopleSearch: []
+            }
+        }
+        case SOCIAL_ACTIONS.REMOVE_FRIEND: {
+            const newFriends = state.friends.filter((fr: any) => fr.email !== action.payload.email)
+
+            return {
+                ...state,
+                friends: newFriends
             }
         }
         default: {

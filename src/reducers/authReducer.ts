@@ -31,7 +31,7 @@ export enum AUTH_ACTIONS {
     FP_SUCCESS = 'FP_SUCCESS',
 }
 
-const reducer = (state = INITIAL_STATE, action: any) => {
+const reducer: any = (state = INITIAL_STATE, action: any) => {
     switch(action.type) {
         case AUTH_ACTIONS.LOGGED_IN: {
             return {

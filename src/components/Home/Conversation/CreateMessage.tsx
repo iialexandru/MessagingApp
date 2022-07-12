@@ -4,19 +4,13 @@ import { format } from 'date-fns'
 
 import styles from '../../../styles/scss/Home/Conversation/MessageContainer.module.scss';
 import { useSocket } from '../../../hooks/useSocket'
+import { CreateMessageProps } from '@typings'
 
 
-interface Props {
-    conversationId: string;
-    userId: string;
-    addNotReadyMessage: any;
-    myEmail: string;
-    scrollRef: any;
-    nrMessages: any;
-}
 
 
-const CreateMessage: FC<Props> = ({ conversationId, userId, addNotReadyMessage, myEmail, scrollRef, nrMessages }) => {
+
+const CreateMessage: FC<CreateMessageProps> = ({ conversationId, userId, addNotReadyMessage, myEmail, scrollRef, nrMessages, blocked }) => {
     const [ text, setText ] = useState('')
     const [ loading, setLoading ] = useState(false)
     const [ start, setStart ] = useState(false)
@@ -76,7 +70,7 @@ const CreateMessage: FC<Props> = ({ conversationId, userId, addNotReadyMessage, 
 
         const date = format(new Date(), 'dd-MM-yyyy')
 
-        if(start || loading || (!text.length && !files.length)) return;
+        if(start || loading || (!text.length && !files.length) || blocked) return;
         setStart(true)
 
         setLoading(true);
@@ -124,7 +118,7 @@ const CreateMessage: FC<Props> = ({ conversationId, userId, addNotReadyMessage, 
                 {!loading && <input type='file' id='file' name='file' onChange={uploadPhoto} style={{ display: 'none' }} onClick={e => { const target = e.target as HTMLInputElement; target.value = '' } } accept='image/*' /> }
             </div>
             <div className={styles.send} onClick={e => sendMessage_(e)}>
-                <img src='https://res.cloudinary.com/multimediarog/image/upload/v1656149617/MessagingApp/send-4006_ebpjrw.svg' width={25} height={25} alt='Send' />
+                <img src={!blocked ? 'https://res.cloudinary.com/multimediarog/image/upload/v1656149617/MessagingApp/send-4006_ebpjrw.svg' : 'https://res.cloudinary.com/multimediarog/image/upload/v1657525036/MessagingApp/black-padlock-11724_hfyjhx.svg'} width={25} height={25} alt='Send' />
             </div>
         </div>
     )

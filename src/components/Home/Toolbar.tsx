@@ -23,10 +23,6 @@ const Toolbar: FC<Props> = ({ setSection, section, setNewContainer }) => {
             <div onClick={() => setSection('Social')} className={`${section === 'Social' ? styles.active : ''} ${styles.sec_opt}`}>
                 <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655987227/MessagingApp/user-251_rovsr3.svg' width={30} height={30} alt='Messages' />
             </div>
-
-            <div onClick={() => setSection('Profile')} className={`${section === 'Profile' ? styles.active : ''} ${styles.sec_opt}`}>
-                <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655987542/MessagingApp/user-3296_qrcrcb.svg' width={30} height={30} alt='Messages' />
-            </div>
         </div>
     )
 }

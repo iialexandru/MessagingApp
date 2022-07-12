@@ -2,7 +2,6 @@ import axios from 'axios'
 
 import { CONVERSATION_ACTIONS } from '../reducers/conversationReducer'
 import { server } from '../config/index'
-import { useSocket } from '../hooks/useSocket'
 
 
 export const getInitialMessages = ({ conversationId, onSuccess, onGettingMessages, totalUnseen }: { totalUnseen: number, onGettingMessages: () => void, conversationId: string, onSuccess: () => void }) => async (dispatch: any) => {
@@ -23,7 +22,6 @@ export const getInitialMessages = ({ conversationId, onSuccess, onGettingMessage
 }
 
 
-
 export const getPreviousMessages = ({ conversationId, skip, onFinish }: { conversationId: string, skip: number, onFinish: () => void }) => async (dispatch: any) => {
     try {
         const result = (await axios.get(`${server}/api/conversation/show-conversation/${conversationId}?limit=${100}&skip=${skip}`, { withCredentials: true })).data
@@ -42,14 +40,16 @@ export const getPreviousMessages = ({ conversationId, skip, onFinish }: { conver
     onFinish()
 }
 
+
 export const receiveMessage = ({ conversationId, message, email, userId, onMyMessage, id, finished, senderEmail }: { senderEmail: string, id: number, finished: boolean, onMyMessage: ({ senderEmail }: { senderEmail: string }) => void, conversationId: string, message: any, email: string, userId: string }) => async (dispatch: any) => {
     try {
+        console.log(message)
         dispatch({
             type: CONVERSATION_ACTIONS.RECEIVE_NEW_MESSAGE,
             payload: { id: conversationId, newMessage: message, userId, email }
         })
 
-        onMyMessage({ senderEmail })
+        // onMyMessage({ senderEmail })
 
         if(finished) {
             dispatch({
@@ -134,5 +134,52 @@ export const deleteNotReadyMessage = ({ id, conversationId }: { id: number, conv
         })
     } catch (err) {
         console.log(err)
+    }
+}
+
+
+export const getConversations = ({ onFinish }: { onFinish: () => void }) => async (dispatch: any) => {
+    try {
+        const result = (await axios.get(`${server}/api/conversation/show-conversations`, { withCredentials: true })).data
+
+        dispatch({
+            type: CONVERSATION_ACTIONS.GET_CONVERSATIONS,
+            payload: { conversations: result.conversations }
+        })
+    } catch (err) {
+        console.log(err)
+    }
+
+    onFinish()
+}
+
+
+export const addConversation = ({ conversation, onAdded }: { conversation: any, onAdded: any }) => (dispatch: any) => {
+    try { 
+        dispatch({
+            type: CONVERSATION_ACTIONS.ADD_CONVERSATION,
+            payload: { conversation }
+        })
+
+        if(Boolean(onAdded)) {
+            onAdded()
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}  
+
+export const removeConversation = ({ conversationId, onSuccess }: { conversationId: string, onSuccess: () => void }) => (dispatch: any) => {
+    try {
+        dispatch({
+            type: CONVERSATION_ACTIONS.REMOVE_CONVERSATION,
+            payload: { conversationId }
+        })
+
+        if(onSuccess) {
+            onSuccess()
+        }
+    } catch (err) {
+         console.log(err)
     }
 }

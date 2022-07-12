@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from 'react'
 import { useState } from 'react'
 
 import styles from '../../../styles/scss/Home/Social/SocialContainer.module.scss';
@@ -6,7 +7,7 @@ import Friends from './Friends/Friends';
 import Requests from './Requests/Requests';
 
 
-const SocialContainer = () => {
+const SocialContainer = ({ setConversationId }: { setConversationId: Dispatch<SetStateAction<string | null>> }) => {
     const sections = [
         'https://res.cloudinary.com/multimediarog/image/upload/v1655987250/MessagingApp/user-251_lzpkgb.svg',
         'https://res.cloudinary.com/multimediarog/image/upload/v1656246252/MessagingApp/team-5701_1_uqv9wx.svg',
@@ -25,7 +26,7 @@ const SocialContainer = () => {
                 <img onClick={() => setSection(section => section + 1 > 2 ? 0 : section + 1)} id='arrow' src='https://res.cloudinary.com/multimediarog/image/upload/v1656156060/MessagingApp/share-arrow-855_gbwwyg.svg' width={100} height={70} alt='right-arrow' />
             </div>
             {section === 0 && <AddFriend /> }
-            {section === 1 && <Friends /> }
+            {section === 1 && <Friends setConversationId={setConversationId} /> }
             {section === 2 && <Requests /> }
         </div>
     )

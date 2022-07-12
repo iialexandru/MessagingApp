@@ -1,8 +1,10 @@
-import type { FC } from 'react';
+import type { FC, Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 import { connect } from 'react-redux'
 
 import { blockFriend, unblockFriend, removeFriend, updateFriends } from '../../../../actions/socialActions'
+import { removeConversation } from '../../../../actions/conversationActions'
+import { useSocket } from '../../../../hooks/useSocket'
 import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.scss';
 
 
@@ -14,16 +16,25 @@ interface Item {
     unblockFriend: (dispatch: any) => void; 
     removeFriend: (dispatch: any) => void; 
     updateFriends: (dispatch: any) => void;
+    removeConversation: any
+    setConversationId: Dispatch<SetStateAction<string | null>>
 }
 
 
-const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, removeFriend, updateFriends }) => {
+const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, removeFriend, updateFriends, removeConversation, setConversationId }) => {
     const [ active, setActive ]  = useState<boolean>(false)
 
     const [ loading, setLoading ] = useState(false)
+    
+    const socket = useSocket()
 
     const onSuccess = () => {
-        updateFriends({})
+        // updateFriends({})
+    }
+
+    const remFrCallback = ({ conversationId }: { conversationId: string }) => {
+        setConversationId(null)
+        removeConversation({ conversationId })
     }
 
 
@@ -54,6 +65,12 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
         setLoading(false)
     }
 
+    
+    const onRemoveFriend = ({ conversationId }: { conversationId: string }) => {
+        socket!.removeConversation({ conversationId })
+    }
+
+
     const remove = (e: any) => {
         e.preventDefault()
 
@@ -61,7 +78,7 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
 
         setLoading(true)
 
-        removeFriend({ email, onSuccess })
+        removeFriend({ email, onSuccess, remFrCallback, onRemoveFriend })
         
         setLoading(false)
     }
@@ -103,4 +120,4 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
     )
 }
 
-export default connect((state: any) => ({  }), { blockFriend, unblockFriend, removeFriend, updateFriends})(Friend);
+export default connect((state: any) => ({  }), { blockFriend, unblockFriend, removeFriend, updateFriends, removeConversation })(Friend);

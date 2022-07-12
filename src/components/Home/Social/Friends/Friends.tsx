@@ -1,3 +1,4 @@
+import type { FC } from 'react'
 import { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
 import { useDebounce } from 'use-debounce'
@@ -5,19 +6,24 @@ import { useDebounce } from 'use-debounce'
 import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.scss';
 import Friend from './Friend'
 import { resetPeopleSearch, updateFriends } from '../../../../actions/socialActions'
+import { SocialRedux } from '@typings'
 
 
-const Friends = ({ resetPeopleSearch, friends, updateFriends, loading }: { resetPeopleSearch: (dispatch: any) => void, friends: any, updateFriends: (dispatch: any) => void, loading: true }) => {
+const Friends: FC<Omit<SocialRedux, 'peopleSearch' | 'psLoading' | 'showPeopleSearch' | 'showFriendRequests' | 'friendRequests'>> = ({ resetPeopleSearch, friends, updateFriends, loading, setConversationId }) => {
     const [ search, setSearch ] = useState('')
-    const [ _friends, setFriends ] = useState<any>(friends)
+    const allFriends = friends
+    const [ _friends, setFriends ] = useState<any>(allFriends)
 
     useEffect(() => {
         resetPeopleSearch({})
-    }, [ resetPeopleSearch ])
+        // updateFriends({})
+    }, [ resetPeopleSearch, updateFriends ])
 
     useEffect(() => {
-        updateFriends({})
-    }, [ updateFriends ])
+        if(allFriends) {
+            setFriends(allFriends)
+        }
+    }, [ allFriends ])
 
     useEffect(() => {
         if(!search.length) {
@@ -64,7 +70,7 @@ const Friends = ({ resetPeopleSearch, friends, updateFriends, loading }: { reset
                                 {_friends.map((person: { email: string, username: string, blocked: boolean }, key: number) => {
                                     return (
                                         <div key={key} className={styles.values}>
-                                            <Friend key={key + 10} blocked={person.blocked}  email={person.email} name={person.username} />
+                                            <Friend key={key + 10} blocked={person.blocked}  email={person.email} name={person.username} setConversationId={setConversationId} />
                                         </div>
                                     )
                                 })}
