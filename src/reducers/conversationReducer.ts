@@ -19,11 +19,23 @@ export enum CONVERSATION_ACTIONS {
     GET_CONVERSATIONS = 'GET_CONVERSATIONS',
     ADD_CONVERSATION = 'ADD_CONVERSATION',
     REMOVE_CONVERSATION = 'REMOVE_CONVERSATION',
+    DELETE_DATA = 'DELETE_DATA',
 }
 
 
 const reducer = (state: any = INITIAL_STATE, action: any) => {
     switch(action.type) {
+        case CONVERSATION_ACTIONS.DELETE_DATA: {
+            return {
+                ...state,
+                messages: {},
+                total: {},
+                lastMessages: {},
+                nrMessages: {},
+                nrMessagesLoadings: {},
+                conversations: []
+            }
+        }
         case CONVERSATION_ACTIONS.GET_INITIAL_MESSAGES: {
             return {
                 ...state,

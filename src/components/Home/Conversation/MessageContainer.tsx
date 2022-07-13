@@ -178,6 +178,7 @@ const MessageContainer: FC<MessageContainerProps> = ({ mcRef, addNotReadyMessage
                     }
                 </>
                 }
+                
                 {(nrMessagesLoadings[conversationId] && nrMessagesLoadings[conversationId][0] && nrMessagesLoadings[conversationId][0].active) ? 
                     <div className={styles.status_message}>
                         <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657179756/MessagingApp/Spinner-1s-200px_4_ds6f4r.svg' width={30} height={30} alt='SVG' />

@@ -38,9 +38,25 @@
 } 
 
 .flex_list {
+    position: relative;
     display: flex;
     flex-flow: column nowrap;
     border-right: 2px solid $gray;
+    height: 100%;
+}
+
+.logout {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: red;
+    padding: .2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom-left-radius: 7px;
+    background-color: #E9E9E9;
+    cursor: pointer;
 }
 
 .header {

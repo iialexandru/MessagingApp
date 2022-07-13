@@ -20,11 +20,11 @@ const App = ({ loggedIn, verifyLogin, userId }: { loggedIn: boolean, verifyLogin
   const socket = useSocket()
 
 
-useEffect(() => {
-  if(loggedIn && socket) {
-    socket!.subscribe({ userId })
-  }
-}, [ loggedIn, userId, socket ])
+  useEffect(() => {
+    if(loggedIn && socket && Boolean(userId.length)) {
+      socket!.subscribe({ userId })
+    }
+  }, [ loggedIn, userId, socket ])
 
 
   useEffect(() => {
@@ -46,8 +46,8 @@ useEffect(() => {
   }, [ loggedIn, navigate, startLoad ])
 
   if(!startLoad) return null;
+
   return (
-    
       <Routes>
           <Route path='/' element={<Navigate to='/home' replace={true} />} />
           <Route path='/authentication/login' element={<Login />} />

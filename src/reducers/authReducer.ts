@@ -29,6 +29,7 @@ export enum AUTH_ACTIONS {
     CODE_REGISTER_SUCCESS = 'CODE_REGISTER_SUCCESS',
     FP_FAIL = 'FP_FAIL',
     FP_SUCCESS = 'FP_SUCCESS',
+    LOGOUT = 'LOGOUT',
 }
 
 const reducer: any = (state = INITIAL_STATE, action: any) => {
@@ -76,6 +77,14 @@ const reducer: any = (state = INITIAL_STATE, action: any) => {
                 loading: false
             }
         }
+        case AUTH_ACTIONS.LOGOUT: {
+            return {
+                loggedIn: false,
+                username: '',
+                email: '',
+                userId: '',
+            }
+        }
         case AUTH_ACTIONS.LOG_IN_FAIL: {
             return {
                 ...state,
@@ -90,7 +99,10 @@ const reducer: any = (state = INITIAL_STATE, action: any) => {
             return {
                 ...state,
                 loading: false,
-                loggedIn: true
+                loggedIn: true,
+                email: action.payload.result.email, 
+                userId: action.payload.result.id,
+                username: action.payload.result.name
             }
         }
         case AUTH_ACTIONS.REGISTER_FAIL: {

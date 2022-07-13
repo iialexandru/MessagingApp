@@ -20,6 +20,7 @@ export enum SOCIAL_ACTIONS {
     FRIENDS = 'FRIENDS',
     REMOVE_FRIEND = 'REMOVE_FRIEND',
     BLOCK_SITUATION = 'BLOCK_SITUATION',
+    DELETE_DATA = 'DELETE_DATA',
 }
 
 
@@ -31,6 +32,16 @@ const reducer: any = (state = INITIAL_VALUES, action: any) => {
                 psLoading: false,
                 loading: false, 
                 peopleSearch: []
+            }
+        }
+        case SOCIAL_ACTIONS.DELETE_DATA: {
+            return {
+                ...state,
+                psLoading: false,
+                loading: false, 
+                peopleSearch: [],
+                friends: [],
+                friendRequests: []
             }
         }
         case SOCIAL_ACTIONS.FRIENDS: {

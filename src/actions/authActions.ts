@@ -27,6 +27,13 @@ export const defaultState = () => (dispatch: any) => {
     })
 }
 
+export const logout = ({ onSuccess }: { onSuccess: () => void }) => (dispatch: any) => {
+    dispatch({
+        type: AUTH_ACTIONS.LOGOUT
+    })
+
+    onSuccess()
+}
 
 
 export const login = ({ email, password, onSuccess }: { email: string, password: string, onSuccess: () => void }) => async (dispatch: any) => {

@@ -4,6 +4,12 @@ import { CONVERSATION_ACTIONS } from '../reducers/conversationReducer'
 import { server } from '../config/index'
 
 
+export const deleteConversationData = () => (dispatch: any) => {
+    dispatch({
+        type: CONVERSATION_ACTIONS.DELETE_DATA
+    })
+}
+
 export const getInitialMessages = ({ conversationId, onSuccess, onGettingMessages, totalUnseen }: { totalUnseen: number, onGettingMessages: () => void, conversationId: string, onSuccess: () => void }) => async (dispatch: any) => {
     try {
         const result = (await axios.get(`${server}/api/conversation/show-conversation/${conversationId}?limit=${100}&skip=${0}&add=${totalUnseen || 0}`, { withCredentials: true })).data

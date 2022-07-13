@@ -4,6 +4,12 @@ import { SOCIAL_ACTIONS } from '../reducers/socialReducer'
 import { server } from '../config/index'
 
 
+export const deleteSocialData = () => (dispatch: any) => {
+    dispatch({ 
+        type: SOCIAL_ACTIONS.DELETE_DATA
+    })
+}
+
 export const updateFriends = () => async (dispatch: any) => {
 
     dispatch({

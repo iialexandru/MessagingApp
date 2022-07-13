@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { connect } from 'react-redux'
+import Cookies from 'js-cookie'
+import { useNavigate } from 'react-router-dom'
 
 import styles from '../../styles/scss/Home/Home.module.scss';
 import MessSection from './Conversation/MessSection'
@@ -8,16 +10,20 @@ import Toolbar from './Toolbar'
 import MessageContainer from './Conversation/MessageContainer'
 import SocialContainer from './Social/SocialContainer'
 import { useSocket } from '../../hooks/useSocket'
-import { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation } from '../../actions/conversationActions'
+import { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation, deleteConversationData } from '../../actions/conversationActions'
+import { logout } from '../../actions/authActions'
+import { deleteSocialData } from '../../actions/socialActions'
 import SkeletonMessSection from '../../components/Home/Conversation/SkeletonMessSection'
 import Cover from '../../components/Home/Cover'
 import useWindowSize from '../../utils/useWindowSize'
+import { server } from '../../config/index'
 
 import { Section } from '@typings'
 
 
-const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage, lastMessages, seenMessageByOther, getConversations, conversations, removeConversation, addConversation }: { addConversation: any, removeConversation: any, conversations: any, getConversations: any, seenMessageByOther: any, lastMessages: any, username: string, email: string, userId: string, receiveMessage: any, _messages: any, lastMessage: any }) => {
+const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, lastMessage, lastMessages, seenMessageByOther, getConversations, conversations, removeConversation, addConversation, logout, deleteConversationData, deleteSocialData }: { deleteSocialData: any, deleteConversationData: any, logout: any, loggedIn: boolean, addConversation: any, removeConversation: any, conversations: any, getConversations: any, seenMessageByOther: any, lastMessages: any, username: string, email: string, userId: string, receiveMessage: any, _messages: any, lastMessage: any }) => {
     const [ section, setSection ] = useState<Section>('Messages')
+
 
     const [ width ] = useWindowSize()
 
@@ -27,6 +33,7 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
     const [ loading, setLoading ] = useState(false)
 
     const mcRef = useRef<any>(null)
+
     const onMyMessage = ({ senderEmail }: { senderEmail: string }) => {
         if(email === senderEmail || (mcRef.current?.scrollTop < mcRef.current?.scrollHeight - mcRef.current?.clientHeight + 35 && mcRef.current?.scrollTop > mcRef.current?.scrollHeight - mcRef.current?.clientHeight - 35)) {
             setTimeout(() => scrollRef.current?.scrollIntoView(), 0)
@@ -67,7 +74,11 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
     useEffect(() => {
         const source = axios.CancelToken.source()
 
+        
+        if(!loggedIn || !Boolean(email.length) || !Boolean(userId)) return;
+        
         socket!.eventListeners({ receiveMessage: receiveMessageProp, seenMessageByOther: seenMessageByOtherProp, email, userId, removeConversation: removeConversationProp, addConversation: addConversationProp })
+
     
         lastMessage()
 
@@ -81,11 +92,33 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
         }
 
         initialConversations()
+        
 
         return () => {
             source.cancel()
         }
-    }, [])
+    }, [ loggedIn ])
+
+    const logoutAccount = async (e: any) => {
+        e.preventDefault()
+
+        try {
+            await axios.post(`${server}/api/miscellaneous/logout`, {}, { withCredentials: true })
+            Cookies.remove('auth-token')
+            socket!.unsubscribe()
+            deleteConversationData()
+            deleteSocialData()
+            
+            const onSuccess = () => {
+                window.location.reload()
+            }
+            
+            logout({ onSuccess })
+
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
     return (
         <div className={styles.container}>
@@ -156,6 +189,12 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
                         {(!conversationId && width < 800 && section === 'Social') &&
                             <SocialContainer setConversationId={setConversationId} />
                         }
+
+                    {(width >= 800 || (width < 800 && section === 'Messages' && !conversationId)) &&
+                        <div className={styles.logout} onClick={e => logoutAccount(e)}>
+                            <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657658763/MessagingApp/export-arrow-14569_gcl4x8.svg' width={30} height={30} alt='Log out' />
+                        </div>
+                    }
                 </div>
 
                 {width >= 800 &&
@@ -174,4 +213,4 @@ const Home = ({ username, email, userId, receiveMessage, _messages, lastMessage,
     )
 }
 
-export default connect((state: any) => ({ conversations: state.conversation.conversations, email: state.auth.email, username: state.auth.username, userId: state.auth.userId, _messages: state.conversation.messages, _total: state.conversation.total, lastMessages: state.conversation.lastMessages  }), { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation })(Home);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, conversations: state.conversation.conversations, email: state.auth.email, username: state.auth.username, userId: state.auth.userId, _messages: state.conversation.messages, _total: state.conversation.total, lastMessages: state.conversation.lastMessages  }), { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation, logout, deleteConversationData, deleteSocialData })(Home);
