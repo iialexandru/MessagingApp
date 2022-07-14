@@ -20,6 +20,7 @@ export enum CONVERSATION_ACTIONS {
     ADD_CONVERSATION = 'ADD_CONVERSATION',
     REMOVE_CONVERSATION = 'REMOVE_CONVERSATION',
     DELETE_DATA = 'DELETE_DATA',
+    STATUS_CONVERSATION = 'STATUS_CONVERSATION',
 }
 
 
@@ -184,6 +185,35 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
         }
         case CONVERSATION_ACTIONS.REMOVE_CONVERSATION: {
             const newConversations = state.conversations.filter((conv: any) => conv._id !== action.payload.conversationId)
+
+            return {
+                ...state,
+                conversations: newConversations
+            }
+        }
+        case CONVERSATION_ACTIONS.STATUS_CONVERSATION: {
+            let newConversations = state.conversations
+
+            if(action.payload.friendId) {
+                newConversations = newConversations.map((conv: any) => {
+                    if(conv.peopleIds.includes(action.payload.friendId)) {
+                        conv.blocked = action.payload.convStatus
+                    }
+
+                    return conv;
+                })
+            } else if(action.payload.conversationId) {
+                newConversations = newConversations.map((conv: any) => {
+                    if(conv._id === action.payload.conversationId) {
+                        conv.blocked = action.payload.convStatus
+                    }
+
+                    return conv;
+                })
+            }
+
+            console.log(newConversations)
+            
 
             return {
                 ...state,

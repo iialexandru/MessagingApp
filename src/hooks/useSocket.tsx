@@ -20,7 +20,7 @@ export const useSocketInit = () => {
     }
 
 
-    const eventListeners = async ({ receiveMessage, email, userId, seenMessageByOther, removeConversation, addConversation }: { addConversation: any, removeConversation: any, seenMessageByOther: any, userId: string, receiveMessage: any, email: string }) => {
+    const eventListeners = async ({ receiveMessage, email, userId, seenMessageByOther, removeConversation, addConversation, conversationStatus }: { conversationStatus: any, addConversation: any, removeConversation: any, seenMessageByOther: any, userId: string, receiveMessage: any, email: string }) => {
         if(!socket) return;
         
         socket.on('receive-message', ({ message, conversationId, finished, id, senderEmail }: { id: number, senderEmail: string, message: string, conversationId: string, finished: boolean }) => {
@@ -44,6 +44,11 @@ export const useSocketInit = () => {
         socket.on('join-the-room', ({ conversationId }: { conversationId: string }) => {
             socket.emit('actually-join-the-room', { conversationId })
         })
+
+        socket.on('update-conversation-status', ({ conversationId, convStatus }: { conversationId: string, convStatus: boolean }) => {
+            console.log('asdasd')
+            conversationStatus({ conversationId, convStatus })
+        })
     }
     
     const sendMessage = ({ text, date, conversationId, userId, files, id }: { id: number, text: string, date: string, conversationId: string, userId: string, files: string[] }) => {
@@ -66,11 +71,15 @@ export const useSocketInit = () => {
         socket.emit('join-room', { conversationId: conversation._id, friends: conversation.peopleIds })
     }
 
+    const sendConversationStatus = ({ conversationId, convStatus }: { conversationId: string, convStatus: boolean }) => {
+        socket.emit('conversation-status', { conversationId, convStatus})
+    }
+
     const unsubscribe = () => {
         setSocket(null)
         socket.disconnect()
     }
 
-    return { eventListeners, subscribe, unsubscribe, sendMessage, messageSeenByOther, addNewConversation, removeConversation, joinRoom }
+    return { eventListeners, subscribe, unsubscribe, sendMessage, messageSeenByOther, addNewConversation, removeConversation, joinRoom, sendConversationStatus }
 }
 export const useSocket = singletonHook(init, useSocketInit)

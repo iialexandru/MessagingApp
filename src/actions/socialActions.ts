@@ -51,7 +51,7 @@ export const addFriend = ({ email, onSuccess  }: { email: string, onSuccess: () 
     }
 }
 
-export const removeFriend = ({ email, onSuccess, remFrCallback, onRemoveFriend }: { onRemoveFriend: any, email: string, onSuccess: () => void, remFrCallback: ({ conversationId }: { conversationId: string }) => void }) => async (dispatch: any) => {
+export const removeFriend = ({ email, remFrCallback, onRemoveFriend }: { onRemoveFriend: any, email: string, remFrCallback: ({ conversationId }: { conversationId: string }) => void }) => async (dispatch: any) => {
     try {
         const result = (await axios.post(`${server}/api/social/remove-friend`, { email }, { withCredentials: true })).data
 
@@ -60,7 +60,6 @@ export const removeFriend = ({ email, onSuccess, remFrCallback, onRemoveFriend }
             payload: { email }
         })
 
-        onSuccess()
         
         onRemoveFriend({ conversationId: result.conversationId })
 
@@ -148,22 +147,32 @@ export const resetPeopleSearch = () => (dispatch: any) => {
 }
 
 
-export const blockFriend = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
+export const blockFriend = ({ email, onSuccess, friendId }: { email: string, onSuccess: any, friendId: string }) => async (dispatch: any) => {
     try {
-        await axios.post(`${server}/api/social/block-friend`, { email }, { withCredentials: true })
+        const result = (await axios.post(`${server}/api/social/block-friend`, { email }, { withCredentials: true })).data
 
-        onSuccess()
+        dispatch({
+            type: SOCIAL_ACTIONS.BLOCK_SITUATION,
+            payload: { friendId }
+        })
+
+        onSuccess({ conversationId: result.id, convStatus: result.convStatus })
     } catch (err) {
         console.log(err)
     }
 }
 
 
-export const unblockFriend = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
+export const unblockFriend = ({ email, onSuccess, friendId }: { email: string, onSuccess: any, friendId: string }) => async (dispatch: any) => {
     try {
-        await axios.post(`${server}/api/social/unblock-friend`, { email }, { withCredentials: true })
+        const result = (await axios.post(`${server}/api/social/unblock-friend`, { email }, { withCredentials: true })).data
 
-        onSuccess()
+        dispatch({
+            type: SOCIAL_ACTIONS.BLOCK_SITUATION,
+            payload: { friendId }
+        })
+
+        onSuccess({ conversationId: result.id, convStatus: result.convStatus })
     } catch (err) {
         console.log(err)
     }

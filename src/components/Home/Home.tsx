@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { connect } from 'react-redux'
 import Cookies from 'js-cookie'
-import { useNavigate } from 'react-router-dom'
 
 import styles from '../../styles/scss/Home/Home.module.scss';
 import MessSection from './Conversation/MessSection'
@@ -10,7 +9,7 @@ import Toolbar from './Toolbar'
 import MessageContainer from './Conversation/MessageContainer'
 import SocialContainer from './Social/SocialContainer'
 import { useSocket } from '../../hooks/useSocket'
-import { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation, deleteConversationData } from '../../actions/conversationActions'
+import { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation, deleteConversationData, statusConversation } from '../../actions/conversationActions'
 import { logout } from '../../actions/authActions'
 import { deleteSocialData } from '../../actions/socialActions'
 import SkeletonMessSection from '../../components/Home/Conversation/SkeletonMessSection'
@@ -21,9 +20,8 @@ import { server } from '../../config/index'
 import { Section } from '@typings'
 
 
-const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, lastMessage, lastMessages, seenMessageByOther, getConversations, conversations, removeConversation, addConversation, logout, deleteConversationData, deleteSocialData }: { deleteSocialData: any, deleteConversationData: any, logout: any, loggedIn: boolean, addConversation: any, removeConversation: any, conversations: any, getConversations: any, seenMessageByOther: any, lastMessages: any, username: string, email: string, userId: string, receiveMessage: any, _messages: any, lastMessage: any }) => {
+const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, lastMessage, lastMessages, seenMessageByOther, getConversations, conversations, removeConversation, addConversation, logout, deleteConversationData, deleteSocialData, statusConversation }: { statusConversation: any, deleteSocialData: any, deleteConversationData: any, logout: any, loggedIn: boolean, addConversation: any, removeConversation: any, conversations: any, getConversations: any, seenMessageByOther: any, lastMessages: any, username: string, email: string, userId: string, receiveMessage: any, _messages: any, lastMessage: any }) => {
     const [ section, setSection ] = useState<Section>('Messages')
-
 
     const [ width ] = useWindowSize()
 
@@ -70,6 +68,10 @@ const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, la
         addConversation({ conversation, onAdded })
     }
 
+    const statusConversationProps = ({ conversationId, convStatus }: { conversationId: string, convStatus: boolean }) => {
+        statusConversation({ conversationId, convStatus })
+    }
+
  
     useEffect(() => {
         const source = axios.CancelToken.source()
@@ -77,7 +79,7 @@ const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, la
         
         if(!loggedIn || !Boolean(email.length) || !Boolean(userId)) return;
         
-        socket!.eventListeners({ receiveMessage: receiveMessageProp, seenMessageByOther: seenMessageByOtherProp, email, userId, removeConversation: removeConversationProp, addConversation: addConversationProp })
+        socket!.eventListeners({ receiveMessage: receiveMessageProp, seenMessageByOther: seenMessageByOtherProp, email, userId, removeConversation: removeConversationProp, addConversation: addConversationProp, conversationStatus: statusConversationProps })
 
     
         lastMessage()
@@ -190,7 +192,7 @@ const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, la
                             <SocialContainer setConversationId={setConversationId} />
                         }
 
-                    {(width >= 800 || (width < 800 && section === 'Messages' && !conversationId)) &&
+                    {((width >= 800 && !loading) || (width < 800 && section === 'Messages' && !conversationId && !loading)) &&
                         <div className={styles.logout} onClick={e => logoutAccount(e)}>
                             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657658763/MessagingApp/export-arrow-14569_gcl4x8.svg' width={30} height={30} alt='Log out' />
                         </div>
@@ -213,4 +215,4 @@ const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, la
     )
 }
 
-export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, conversations: state.conversation.conversations, email: state.auth.email, username: state.auth.username, userId: state.auth.userId, _messages: state.conversation.messages, _total: state.conversation.total, lastMessages: state.conversation.lastMessages  }), { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation, logout, deleteConversationData, deleteSocialData })(Home);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, conversations: state.conversation.conversations, email: state.auth.email, username: state.auth.username, userId: state.auth.userId, _messages: state.conversation.messages, _total: state.conversation.total, lastMessages: state.conversation.lastMessages  }), { receiveMessage, lastMessage, seenMessageByOther, getConversations, removeConversation, addConversation, logout, deleteConversationData, deleteSocialData, statusConversation })(Home);

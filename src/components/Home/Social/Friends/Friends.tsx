@@ -55,8 +55,9 @@ const Friends: FC<Omit<SocialRedux, 'peopleSearch' | 'psLoading' | 'showPeopleSe
         })
         setFriends(newFriends)
     }, [ search ])
-
     
+console.log(_friends)
+
     return (
         <div className={styles.friends_container}>
             <input value={search} onChange={e => setSearch(e.target.value)} />
@@ -65,10 +66,10 @@ const Friends: FC<Omit<SocialRedux, 'peopleSearch' | 'psLoading' | 'showPeopleSe
                 <>
                     {!loading ?
                             <>
-                                {_friends.map((person: { email: string, username: string, blocked: boolean }, key: number) => {
+                                {_friends.map((person: { email: string, username: string, blocked: boolean, friendId: string }, key: number) => {
                                     return (
                                         <div key={key} className={styles.values}>
-                                            <Friend key={key + 10} blocked={person.blocked}  email={person.email} name={person.username} setConversationId={setConversationId} />
+                                            <Friend key={key + 10} friendId={person.friendId} blocked={person.blocked}  email={person.email} name={person.username} setConversationId={setConversationId} />
                                         </div>
                                     )
                                 })}

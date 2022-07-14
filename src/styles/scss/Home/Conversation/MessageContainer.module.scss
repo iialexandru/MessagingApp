@@ -248,9 +248,10 @@
 
 @media screen and (max-width: 800px) {
     .container {
-        height: 80vh;
+        position: relative;
         justify-content: revert;
         padding-inline: 1em;
+        padding-bottom: 0;
     }
 
     .messages_container {
@@ -258,9 +259,12 @@
     }
 
     .tooltext {
+        position: relative;
         height: auto;
         width: 100%;
         padding-inline: 0;
+        padding-block: 0;
+        bottom: -20px;
     }
 
     .message img {

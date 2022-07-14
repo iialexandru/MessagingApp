@@ -106,6 +106,23 @@ const reducer: any = (state = INITIAL_VALUES, action: any) => {
                 friends: newFriends
             }
         }
+        case SOCIAL_ACTIONS.BLOCK_SITUATION: {
+            let newFriends: any = state.friends
+
+            newFriends = newFriends.map((fr: any) => {
+                if(action.payload.friendId === fr.friendId) {
+                    const block = fr.blocked
+                    fr.blocked = !block
+                }
+
+                return fr
+            })
+
+            return {
+                ...state,
+                friends: newFriends
+            }
+        }
         default: {
             return state
         }

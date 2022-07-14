@@ -2,8 +2,8 @@ import type { FC, Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 import { connect } from 'react-redux'
 
-import { blockFriend, unblockFriend, removeFriend, updateFriends } from '../../../../actions/socialActions'
-import { removeConversation } from '../../../../actions/conversationActions'
+import { blockFriend, unblockFriend, removeFriend } from '../../../../actions/socialActions'
+import { removeConversation, statusConversation } from '../../../../actions/conversationActions'
 import { useSocket } from '../../../../hooks/useSocket'
 import styles from '../../../../styles/scss/Home/Social/SocialContainer.module.scss';
 import useWindowSize from '../../../../utils/useWindowSize'
@@ -13,26 +13,30 @@ interface Item {
     name: string;
     email: string;
     blocked: boolean;
+    friendId: string;
     blockFriend: (dispatch: any) => void; 
     unblockFriend: (dispatch: any) => void; 
     removeFriend: (dispatch: any) => void; 
-    updateFriends: (dispatch: any) => void;
     removeConversation: any
-    setConversationId: Dispatch<SetStateAction<string | null>>
+    setConversationId: Dispatch<SetStateAction<string | null>>;
+    statusConversation: any;
 }
 
 
-const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, removeFriend, updateFriends, removeConversation, setConversationId }) => {
+const Friend: FC<Item> = ({ friendId, name, email, blocked, blockFriend, unblockFriend, removeFriend, removeConversation, setConversationId, statusConversation }) => {
     const [ active, setActive ]  = useState<boolean>(false)
 
     const [ loading, setLoading ] = useState(false)
 
-    const [ width ] = useWindowSize()
     
     const socket = useSocket()
 
-    const onSuccess = () => {
-       return;
+    const onSuccess = ({ conversationId, convStatus }: { conversationId: string, convStatus: boolean }) => {
+        const onSocket = () => {
+            socket!.sendConversationStatus({ conversationId, convStatus })
+        }
+
+       statusConversation({ conversationId, convStatus, onSocket })
     }
 
     const remFrCallback = ({ conversationId }: { conversationId: string }) => {
@@ -49,21 +53,21 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
         setLoading(true)
 
 
-        blockFriend({ email, onSuccess });
+        blockFriend({ email, onSuccess, friendId });
 
         
         setLoading(false)
     }
 
 
-    const unblock = (e: any) => {
+    const unblock = async (e: any) => {
         e.preventDefault()
 
         if(loading) return;
 
         setLoading(true)
 
-        unblockFriend({ email, onSuccess })
+        unblockFriend({ email, onSuccess, friendId })
         
         setLoading(false)
     }
@@ -81,7 +85,7 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
 
         setLoading(true)
 
-        removeFriend({ email, onSuccess, remFrCallback, onRemoveFriend })
+        removeFriend({ email, remFrCallback, onRemoveFriend })
         
         setLoading(false)
     }
@@ -129,4 +133,4 @@ const Friend: FC<Item> = ({ name, email, blocked, blockFriend, unblockFriend, re
     )
 }
 
-export default connect((state: any) => ({  }), { blockFriend, unblockFriend, removeFriend, updateFriends, removeConversation })(Friend);
+export default connect((state: any) => ({  }), { blockFriend, unblockFriend, removeFriend, removeConversation, statusConversation })(Friend);

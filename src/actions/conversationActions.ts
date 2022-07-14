@@ -189,3 +189,21 @@ export const removeConversation = ({ conversationId, onSuccess }: { conversation
          console.log(err)
     }
 }
+
+
+export const statusConversation = ({ conversationId, convStatus, onSocket }: { conversationId: string, convStatus: boolean, onSocket?: any }) => async (dispatch: any) => {
+    try {
+        console.log(conversationId, convStatus)
+
+        dispatch({
+            type: CONVERSATION_ACTIONS.STATUS_CONVERSATION,
+            payload: { conversationId, convStatus }
+        })
+
+        if(onSocket) {
+            onSocket()
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
