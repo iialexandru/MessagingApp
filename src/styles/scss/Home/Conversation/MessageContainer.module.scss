@@ -93,12 +93,14 @@
 
 .status_message {
     display: flex;
+    position: relative;
     align-items: center;
     font-family: 'Baloo Bhai 2';
     color: darken(white, 30);
     gap: .3em;
     height: 1.5rem;
-    margin-top: -20px;
+    margin-top: -15px;
+    bottom: -5px;
 }
 
 .messages_container {
