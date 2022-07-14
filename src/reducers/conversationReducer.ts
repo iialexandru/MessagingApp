@@ -51,7 +51,6 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
 
             let totalUnseen
             if(email !== senderEmail){
-                // const hasMessages = Object.keys(state.lastMessages).some((p: any) => { console.log(p, action.payload.id); return p === action.payload.id })
                 totalUnseen = (state.lastMessages?.[ action.payload.id ]?.totalUnseen || 0) + 1
             } else {
                 totalUnseen =  state.lastMessages?.[ action.payload.id ]?.totalUnseen || 0
@@ -210,10 +209,7 @@ const reducer = (state: any = INITIAL_STATE, action: any) => {
 
                     return conv;
                 })
-            }
-
-            console.log(newConversations)
-            
+            }            
 
             return {
                 ...state,

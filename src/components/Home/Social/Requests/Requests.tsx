@@ -33,16 +33,15 @@ const Requests: FC<Omit<SocialRedux, 'peopleSearch' | 'updateFriends' | 'psLoadi
         
         const newFriendRequests: any = []
 
-        const letters = search.split('')
+        const letters = search.toLowerCase().split('')
         
         _friendRequests.forEach((friend: any) => {
-            const friendLetters = friend.email.split('')
+            const friendLetters = friend.email.toLowerCase().split('')
 
             if(friendLetters.length < letters.length) return;
 
             let valid = true
 
-            console.log(friendLetters, letters)
             for(let i = 0; i < letters.length; i++) {
                 if(friendLetters[i] !== letters[i]) {
                     valid = false

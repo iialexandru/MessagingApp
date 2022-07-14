@@ -46,7 +46,6 @@ export const useSocketInit = () => {
         })
 
         socket.on('update-conversation-status', ({ conversationId, convStatus }: { conversationId: string, convStatus: boolean }) => {
-            console.log('asdasd')
             conversationStatus({ conversationId, convStatus })
         })
     }

@@ -193,8 +193,6 @@ export const removeConversation = ({ conversationId, onSuccess }: { conversation
 
 export const statusConversation = ({ conversationId, convStatus, onSocket }: { conversationId: string, convStatus: boolean, onSocket?: any }) => async (dispatch: any) => {
     try {
-        console.log(conversationId, convStatus)
-
         dispatch({
             type: CONVERSATION_ACTIONS.STATUS_CONVERSATION,
             payload: { conversationId, convStatus }

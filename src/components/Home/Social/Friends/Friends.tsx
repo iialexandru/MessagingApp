@@ -32,16 +32,15 @@ const Friends: FC<Omit<SocialRedux, 'peopleSearch' | 'psLoading' | 'showPeopleSe
         
         const newFriends: any = []
 
-        const letters = search.split('')
+        const letters = search.toLowerCase().split('')
         
         _friends.forEach((friend: any) => {
-            const friendLetters = friend.email.split('')
+            const friendLetters = friend.email.toLowerCase().split('')
 
             if(friendLetters.length < letters.length) return;
 
             let valid = true
 
-            console.log(friendLetters, letters)
             for(let i = 0; i < letters.length; i++) {
                 if(friendLetters[i] !== letters[i]) {
                     valid = false
@@ -56,7 +55,6 @@ const Friends: FC<Omit<SocialRedux, 'peopleSearch' | 'psLoading' | 'showPeopleSe
         setFriends(newFriends)
     }, [ search ])
     
-console.log(_friends)
 
     return (
         <div className={styles.friends_container}>
