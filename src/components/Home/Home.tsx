@@ -128,8 +128,8 @@ const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, la
                 <div className={styles.flex_list}>
                     <div className={styles.header}>
                         <div className={styles.headline}>
-                            <img src='https://res.cloudinary.com/multimediarog/image/upload/v1655985142/MessagingApp/Messages-icon_spndmi.png' width={35} height={35} alt='logo' />
-                            <h2>Messager</h2>
+                            <img src={(!conversationId || width >= 800) ? 'https://res.cloudinary.com/multimediarog/image/upload/v1655985142/MessagingApp/Messages-icon_spndmi.png' : 'https://res.cloudinary.com/multimediarog/image/upload/v1655985701/MessagingApp/man_5-512_esb1fi.webp' } width={35} height={35} alt='logo' />
+                            <h2>{(!conversationId || width >= 800) ? 'Messager' : conversations.filter((conv: any) => conv._id === conversationId)[0].people.filter((chatter: any) => chatter.email !== email)[0].username}</h2>
                         </div>
 
                         {((width < 800 && conversationId) || (width < 800 && section === 'Social')) ?
