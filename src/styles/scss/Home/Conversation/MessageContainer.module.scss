@@ -20,9 +20,12 @@
         font-size: clamp(.9rem, 2.5vw, 1rem);
     }
 
+    &[id='image'] {
+        padding-inline: 0;
+    }
+
     img {
         position: relative;
-        right: 10px;
         width: 285px;
     }
 }
@@ -245,7 +248,6 @@
         min-width: 230px;
         max-width: 230px;;
         height: 220px;
-        right: 0;
     }
 }
 
@@ -270,7 +272,6 @@
     }
 
     .message img {
-        right: 0;
         image-orientation: from-image;
         min-width: 163px;
         max-width: 163px;
@@ -280,5 +281,14 @@
 
     .container_images {
         width: 100%;
+    }
+}
+
+@media screen and (min-width: 800px) and (max-width: 1200px) {
+    .message img {
+        min-width: 240px;
+        max-width: 240px;
+        height: 260px;
+        position: relative;
     }
 }

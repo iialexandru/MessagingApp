@@ -122,24 +122,26 @@ const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, la
         }
     }
 
+    console.log(width)
+
     return (
         <div className={styles.container}>
             <div className={styles.mess_container}>
                 <div className={styles.flex_list}>
                     <div className={styles.header}>
                         <div className={styles.headline}>
-                            <img src={(!conversationId || width >= 800) ? 'https://res.cloudinary.com/multimediarog/image/upload/v1655985142/MessagingApp/Messages-icon_spndmi.png' : 'https://res.cloudinary.com/multimediarog/image/upload/v1655985701/MessagingApp/man_5-512_esb1fi.webp' } width={35} height={35} alt='logo' />
-                            <h2>{(!conversationId || width >= 800) ? 'Messager' : conversations.filter((conv: any) => conv._id === conversationId)[0].people.filter((chatter: any) => chatter.email !== email)[0].username}</h2>
+                            <img src={(!conversationId || width > 800) ? 'https://res.cloudinary.com/multimediarog/image/upload/v1655985142/MessagingApp/Messages-icon_spndmi.png' : 'https://res.cloudinary.com/multimediarog/image/upload/v1655985701/MessagingApp/man_5-512_esb1fi.webp' } width={35} height={35} alt='logo' />
+                            <h2>{(!conversationId || width > 800) ? 'Messager' : conversations.filter((conv: any) => conv._id === conversationId)[0].people.filter((chatter: any) => chatter.email !== email)[0].username}</h2>
                         </div>
 
-                        {((width < 800 && conversationId) || (width < 800 && section === 'Social')) ?
+                        {((width <= 800 && conversationId) || (width <= 800 && section === 'Social')) ?
                             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657630110/MessagingApp/curved-arrow-2264_gavulg.svg' onClick={() => { setConversationId(null); setSection('Messages') }} width={30} height={30} alt='Back' />
-                         : (width < 800 && !conversationId) &&
+                         : (width <= 800 && !conversationId) &&
                             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1656246252/MessagingApp/team-5701_1_uqv9wx.svg' onClick={() => { setConversationId(null); setSection('Social') }} width={30} height={30} alt='Messages' />
                         }
                     </div>
 
-                        {((!conversationId && width < 800 && section !== 'Social') || width >= 800) &&
+                        {((!conversationId && width <= 800 && section !== 'Social') || width > 800) &&
                             <div className={styles.section_container}>
                                 {conversations && 
                                     conversations.map((conversation: any, key: number) => {
@@ -184,22 +186,22 @@ const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, la
                             </div>
                         }
                         
-                        {(conversationId && width < 800 && section === 'Messages') &&
+                        {(conversationId && width <= 800 && section === 'Messages') &&
                             <MessageContainer blocked={conversations.filter((conv: any) => conv._id === conversationId)[0] ? conversations.filter((conv: any) => conv._id === conversationId)[0].blocked : false} mcRef={mcRef} scrollRef={scrollRef} globalConversationId={conversationId} newContainer={newContainer} setNewContainer={setNewContainer} userId={userId} myUsername={username} myEmail={email} conversationId={conversationId!} /> 
                         }
 
-                        {(!conversationId && width < 800 && section === 'Social') &&
+                        {(!conversationId && width <= 800 && section === 'Social') &&
                             <SocialContainer setConversationId={setConversationId} />
                         }
 
-                    {((width >= 800 && !loading) || (width < 800 && section === 'Messages' && !conversationId && !loading)) &&
+                    {((width > 800 && !loading) || (width <= 800 && section === 'Messages' && !conversationId && !loading)) &&
                         <div className={styles.logout} onClick={e => logoutAccount(e)}>
                             <img src='https://res.cloudinary.com/multimediarog/image/upload/v1657658763/MessagingApp/export-arrow-14569_gcl4x8.svg' width={30} height={30} alt='Log out' />
                         </div>
                     }
                 </div>
 
-                {width >= 800 &&
+                {width > 800 &&
                     <div className={styles.replacer}>
                         <Toolbar setSection={setSection} section={section} setNewContainer={setNewContainer} />
                         {(section === 'Messages' && conversationId) ? 

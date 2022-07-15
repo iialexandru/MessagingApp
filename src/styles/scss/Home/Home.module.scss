@@ -42,6 +42,7 @@
     display: flex;
     flex-flow: column nowrap;
     height: 100%;
+    border-right: 2px solid $gray;
 }
 
 .logout {
@@ -100,7 +101,7 @@
 }
 
 
-@media screen and (min-width: 800px) and (max-width: 1024px) {
+@media screen and (min-width: 799px) and (max-width: 1024px) {
     .section_container {
         width: 250px;
     }
@@ -110,7 +111,7 @@
     .mess_container {
         flex-flow: column nowrap;
         width: max(90vw, 250px);
-        max-width: 550px;
+        max-width: 500px !important;
     }
 
     .section_container {
@@ -119,5 +120,15 @@
 
     .header {
         height: 70px;
+    }
+
+    .flex_list {
+        border-right: 0;
+    }
+}
+
+@media screen and (min-width: 800px) and (max-width: 1200px) {
+    .mess_container {
+        max-width: 900px;
     }
 }
