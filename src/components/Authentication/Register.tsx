@@ -11,32 +11,44 @@ import { register, defaultState } from '../../actions/authActions'
 import { AuthPropsReducer } from '@typings'
 
 
-const Register = ({ serverErrors, register, loading, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'codeRegister' | 'forgotPassword'> ) => {
+const Register = ({ serverErrors, register, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'codeRegister' | 'forgotPassword'> ) => {
     const navigate = useNavigate()
     const [ show, setShow ] = useState(false)
+    const [ loading, setLoading ] = useState(false)
     
     const { values, errors, setField, verifyValidity, setError } = useFormHandler({ email: '', password: '', username: '' }, serverErrors)
 
     useEffect(() => {
         defaultState({})
-    }, [ defaultState ])
+    }, [])
+
+    console.log(serverErrors, errors)
 
 
     const onSuccess = (url: string) => {
         navigate(`/authentication/code/${url}`)
+        setLoading(false)
     }
 
+    const onFinish = () => {
+        setLoading(false)
+    }
 
     const registerRequest = async (e: any) => {
         e.preventDefault()
 
         setError('fullError', '')
         
-        verifyValidity()
-
-        if(errors?.email?.length > 0 || errors?.password?.length > 0 || errors?.username?.length > 0) return;
+        if(verifyValidity()) return;
         
-        register({ email: values.email, password: values.password, username: values.username, onSuccess })
+        try {
+            setLoading(true)
+
+            await register({ email: values.email, password: values.password, username: values.username, onSuccess, onFinish })
+        } catch (err) {
+            console.log(err)
+            setLoading(false)
+        }
     }
 
 
@@ -137,4 +149,4 @@ const Register = ({ serverErrors, register, loading, defaultState }: Omit<AuthPr
     )
 }
 
-export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors, loading: state.auth.loading }), { register, defaultState })(Register);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors }), { register, defaultState })(Register);

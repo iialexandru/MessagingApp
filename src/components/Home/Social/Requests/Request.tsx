@@ -71,7 +71,7 @@ const Request: FC<Props> = ({ name, email, acceptFriendRequest, rejectFriendRequ
             </div>
 
             <div className={styles.mq_email}>
-                <span>{email} ask doia sid h</span>
+                <span>{email}</span>
             </div> 
 
             <div className={styles.buttons}>

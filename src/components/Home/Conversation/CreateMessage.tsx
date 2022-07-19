@@ -7,9 +7,6 @@ import { useSocket } from '../../../hooks/useSocket'
 import { CreateMessageProps } from '@typings'
 
 
-
-
-
 const CreateMessage: FC<CreateMessageProps> = ({ conversationId, userId, addNotReadyMessage, myEmail, scrollRef, nrMessages, blocked }) => {
     const [ text, setText ] = useState('')
     const [ loading, setLoading ] = useState(false)
@@ -67,8 +64,11 @@ const CreateMessage: FC<CreateMessageProps> = ({ conversationId, userId, addNotR
 
     const sendMessage_ = async (e: any) => {
         e.preventDefault()
+        
+        const rawDate = new Date()
 
-        const date = format(new Date(), 'dd-MM-yyyy')
+        const date = format(rawDate, 'dd-MM-yyyy')
+        const time = `${rawDate.getHours()}:${rawDate.getMinutes()}`
 
         if(start || loading || (!text.length && !files.length) || blocked) return;
         setStart(true)
@@ -84,7 +84,7 @@ const CreateMessage: FC<CreateMessageProps> = ({ conversationId, userId, addNotR
         
 
         try {
-            socket!.sendMessage({ text, date, conversationId, userId, files, id: msgId })
+            socket!.sendMessage({ text, date, conversationId, userId, files, id: msgId, time })
         } catch (err) {
             console.log(err)
         }

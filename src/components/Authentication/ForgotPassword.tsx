@@ -10,8 +10,10 @@ import { forgotPassword, defaultState } from '../../actions/authActions'
 import { AuthPropsReducer } from '@typings'
 
 
-const Login = ({ loading, serverErrors, forgotPassword, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'codeRegister' | 'register'> ) => {
+const Login = ({ serverErrors, forgotPassword, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'codeRegister' | 'register'> ) => {
     const navigate = useNavigate()
+
+    const [ loading, setLoading ] = useState(false)
 
     const [ sent, setSent ] = useState(false)
 
@@ -25,6 +27,11 @@ const Login = ({ loading, serverErrors, forgotPassword, defaultState }: Omit<Aut
 
     const onSuccess = () => {
         setSent(true)
+        setLoading(false)
+    }
+
+    const onFinish = () => {
+        setLoading(false)
     }
 
     const forgotPassRequest = async (e: any) => {
@@ -32,11 +39,15 @@ const Login = ({ loading, serverErrors, forgotPassword, defaultState }: Omit<Aut
 
         setError('fullName', '')
 
-        verifyValidity()
+        if(verifyValidity()) return;
 
-        if(errors?.email?.length > 0) return;
-
-        forgotPassword({ email: values.email, onSuccess })
+        try {
+            setLoading(true)
+            
+            await forgotPassword({ email: values.email, onSuccess, onFinish })
+        } catch (err) {
+            console.log(err)
+        }
     }
     
     return (
@@ -110,4 +121,4 @@ const Login = ({ loading, serverErrors, forgotPassword, defaultState }: Omit<Aut
     )
 }
 
-export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors, loading: state.auth.loading }), { forgotPassword, defaultState })(Login);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors }), { forgotPassword, defaultState })(Login);

@@ -23,7 +23,15 @@ export const verifyLogin = () => async (dispatch: any) => {
 
 export const defaultState = () => (dispatch: any) => {
     dispatch({
+        type: AUTH_ACTIONS.START_LOADING
+    })
+    
+    dispatch({
         type: AUTH_ACTIONS.DEFAULT_STATE
+    })
+
+    dispatch({
+        type: AUTH_ACTIONS.STOP_LOADING
     })
 }
 
@@ -36,11 +44,7 @@ export const logout = ({ onSuccess }: { onSuccess: () => void }) => (dispatch: a
 }
 
 
-export const login = ({ email, password, onSuccess }: { email: string, password: string, onSuccess: () => void }) => async (dispatch: any) => {
-    dispatch({
-        type: AUTH_ACTIONS.START_LOADING
-    })
-
+export const login = ({ email, password, onSuccess, onFinish }: { email: string, password: string, onSuccess: () => void, onFinish: () => void }) => async (dispatch: any) => {
     const data = { email, password }
 
     try {
@@ -55,42 +59,86 @@ export const login = ({ email, password, onSuccess }: { email: string, password:
         
         return
     } catch (err: any) {
-        if(err && err.response && err.response.data.type && err.response.data.type === 'email') {
-            dispatch({
-                type: AUTH_ACTIONS.LOG_IN_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'email' }
-            })
-        } else if(err && err.response && err.response.data.type && err.response.data.type === 'password') {
-            dispatch({
-                type: AUTH_ACTIONS.LOG_IN_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'password' }
-            })
-        } else if(err && err.response && err.response.data.type && err.response.data.type === 'both') {
-            dispatch({
-                type: AUTH_ACTIONS.LOG_IN_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'both' }
-            })
-        } else {
-            dispatch({
-                type: AUTH_ACTIONS.LOG_IN_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'fullError' }
-            })
+        if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.type &&
+          err.response.data.type === 'email' &&
+          err.response.data.message
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.LOG_IN_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'email',
+            },
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.type &&
+          err.response.data.type === 'password' &&
+          err.response.data.message
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.LOG_IN_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'password',
+            },
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.type &&
+          err.response.data.type === 'both' &&
+          err.response.data.message
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.LOG_IN_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'both',
+            },
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.LOG_IN_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'fullError',
+            },
+          });
         }
-    }
+  
+        if ( 
+            err &&
+            err.response &&
+            err.response.data &&
+            err.response.data.err 
+        ) {
+            console.log(err.response.data.err);
+        } else console.log(err)
+      }
 
-    dispatch({
-        type: AUTH_ACTIONS.STOP_LOADING,
-        payload: { loading: false }
-    })
+    onFinish()
 }
 
 
 
-export const register = ({ email, password, username, onSuccess }: {  email: string, password: string, username: string, onSuccess: (param: string) => void }) => async (dispatch: any) => {
-    dispatch({
-        type: AUTH_ACTIONS.START_LOADING
-    })
-
+export const register = ({ email, password, username, onSuccess, onFinish }: {  email: string, password: string, username: string, onSuccess: (param: string) => void, onFinish: () => void }) => async (dispatch: any) => {
     const data = { email, password, username }
 
     try {
@@ -109,48 +157,92 @@ export const register = ({ email, password, username, onSuccess }: {  email: str
         
         return
     } catch (err: any) {
-        if(err && err.response && err.response.data.type && err.response.data.type === 'email') {
-            dispatch({
-                type: AUTH_ACTIONS.REGISTER_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'email' }
-            })
-        } else if(err && err.response && err.response.data.type && err.response.data.type === 'password') {
-            dispatch({
-                type: AUTH_ACTIONS.REGISTER_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'password' }
-            })
-        } else if(err && err.response && err.response.data.type && err.response.data.type === 'username') {
-            dispatch({
-                type: AUTH_ACTIONS.REGISTER_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'username' }
-            })
-        } else {
-            dispatch({
-                type: AUTH_ACTIONS.REGISTER_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'fullError' }
-            })
+        if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message &&
+          err.response.data.type &&
+          err.response.data.type === 'email'
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.REGISTER_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'email',
+            },
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message &&
+          err.response.data.type &&
+          err.response.data.type === 'password'
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.REGISTER_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'password',
+            },
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message &&
+          err.response.data.type &&
+          err.response.data.type === 'username'
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.REGISTER_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'username',
+            },
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.REGISTER_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'fullError',
+            },
+          });
         }
-    }
+  
+        if ( 
+            err &&
+            err.response &&
+            err.response.data &&
+            err.response.data.err 
+        ) {
+        console.log(err.response.data.err);
+        } else console.log(err)
 
-    dispatch({
-        type: AUTH_ACTIONS.STOP_LOADING
-    })
+      }
+    onFinish()
 }
 
 
 
-export const codeRegister = ({ code, onSuccess }: { code: string, onSuccess: () => void }) => async (dispatch: any) => {
-    dispatch({
-        type: AUTH_ACTIONS.START_LOADING
-    })
-
-
+export const codeRegister = ({ code, onSuccess, onFinish }: { code: string, onSuccess: () => void, onFinish: () => void }) => async (dispatch: any) => {
     try {
-        await axios.post(`${server}/api/authentication/register/complete`, { code }, { withCredentials: true })
+        const result = (await axios.post(`${server}/api/authentication/register/complete`, { code }, { withCredentials: true })).data
 
         dispatch({
             type: AUTH_ACTIONS.CODE_REGISTER_SUCCESS,
-            payload: { loading: false, loggedIn: true }
+            payload: { email: result.email, name: result.name, id: result.id }
         })
 
         dispatch({
@@ -161,31 +253,54 @@ export const codeRegister = ({ code, onSuccess }: { code: string, onSuccess: () 
         
         return
     } catch (err: any) {
-        if(err && err.response && err.response.data.type && err.response.data.type === 'code') {
-            dispatch({
-                type: AUTH_ACTIONS.CODE_REGISTER_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'code' }
-            })
-        } else {
-            dispatch({
-                type: AUTH_ACTIONS.CODE_REGISTER_FAIL,
-                payload: { loading: false, error: err.response.data.message, name: 'fullError' }
-            })
+        if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message &&
+          err.response.data.type &&
+          err.response.data.type === 'code'
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.CODE_REGISTER_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'code',
+            },
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.CODE_REGISTER_FAIL,
+            payload: {
+              loading: false,
+              error: err.response.data.message,
+              name: 'fullError',
+            },
+          });
         }
-    }
+  
+        if ( 
+            err &&
+            err.response &&
+            err.response.data &&
+            err.response.data.err 
+        ) {
+        console.log(err.response.data.err);
+        } else console.log(err)
+      }
 
-    dispatch({
-        type: AUTH_ACTIONS.STOP_LOADING
-    })
+    onFinish()
 }
 
 
 
-export const forgotPassword = ({ email, onSuccess }: { email: string, onSuccess: () => void }) => async (dispatch: any) => {
-    dispatch({
-        type: AUTH_ACTIONS.START_LOADING
-    })
-
+export const forgotPassword = ({ email, onSuccess, onFinish }: { email: string, onSuccess: () => void, onFinish: () => void }) => async (dispatch: any) => {
     try {
         await axios.post(`${server}/api/authentication/forgot-password`, { email }, { withCredentials: true })
 
@@ -198,22 +313,24 @@ export const forgotPassword = ({ email, onSuccess }: { email: string, onSuccess:
         return
     } catch (err: any) {
         dispatch({
-            type: AUTH_ACTIONS.FP_FAIL,
-            payload: { error: err.response.data.message, name: 'email' }
-        })
+          type: AUTH_ACTIONS.FP_FAIL,
+          payload: {error: err.response.data.message, name: 'email'},
+        });
+        if ( 
+            err &&
+            err.response &&
+            err.response.data &&
+            err.response.data.err 
+        ) {
+        console.log(err.response.data.err);
+        } else console.log(err)
     }
 
-    dispatch({
-        type: AUTH_ACTIONS.STOP_LOADING
-    })
+    onFinish()
 }
 
 
-export const completeForgotPassword = ({ password, confirmPassword, unique_url, onSuccess, onPageFail }: { password: string, confirmPassword: string, unique_url: string, onSuccess: () => void, onPageFail: () => void }) => async (dispatch: any) => {
-    dispatch({
-        type: AUTH_ACTIONS.START_LOADING
-    })
-
+export const completeForgotPassword = ({ password, confirmPassword, unique_url, onSuccess, onPageFail, onFinish }: { password: string, confirmPassword: string, unique_url: string, onSuccess: () => void, onPageFail: () => void, onFinish: () => void}) => async (dispatch: any) => {
     try {
         await axios.post(`${server}/api/authentication/forgot-password/change/${unique_url}`, { password, confirmPassword }, { withCredentials: true })
 
@@ -225,33 +342,57 @@ export const completeForgotPassword = ({ password, confirmPassword, unique_url, 
 
         return
     } catch (err: any) {
-        if(err && err.response && err.response.data.type && err.response.data.type === 'password') {
-            dispatch({
-                type: AUTH_ACTIONS.FP_FAIL,
-                payload: { error: err.response.data.message, name: 'password' }
-            })
-        } else if(err && err.response && err.response.data.type && err.response.data.type === 'confirmPassword') {
-            dispatch({
-                type: AUTH_ACTIONS.FP_FAIL,
-                payload: { error: err.response.data.message, name: 'confirmPassword' }
-            })
-        }  else if(err && err.response && err.response.data.type && err.response.data.type === 'page') {
-            dispatch({
-                type: AUTH_ACTIONS.STOP_LOADING
-            })
-
-            onPageFail()
-
-            return
+        if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message &&
+          err.response.data.type &&
+          err.response.data.type === 'password'
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.FP_FAIL,
+            payload: {error: err.response.data.message, name: 'password'},
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message &&
+          err.response.data.type &&
+          err.response.data.type === 'confirmPassword'
+        ) {
+          dispatch({
+            type: AUTH_ACTIONS.FP_FAIL,
+            payload: {error: err.response.data.message, name: 'confirmPassword'},
+          });
+        } else if (
+          err &&
+          err.response &&
+          err.response.data &&
+          err.response.data.message &&
+          err.response.data.type &&
+          err.response.data.type === 'page'
+        ) {
+  
+          onPageFail();
+  
+          return;
         } else {
-            dispatch({
-                type: AUTH_ACTIONS.FP_FAIL,
-                payload: { error: err.response.data.message, name: 'fullError' }
-            })
+          dispatch({
+            type: AUTH_ACTIONS.FP_FAIL,
+            payload: {error: err.response.data.message, name: 'fullError'},
+          });
         }
-    }
+        if ( 
+            err &&
+            err.response &&
+            err.response.data &&
+            err.response.data.err 
+        ) {
+        console.log(err.response.data.err);
+        } else console.log(err)
+      }
 
-    dispatch({
-        type: AUTH_ACTIONS.STOP_LOADING
-    })
+    onFinish()
 }

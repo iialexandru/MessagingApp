@@ -13,11 +13,12 @@ import ErrorPage from '../Layout/ErrorPage'
 import { AuthPropsReducer } from '@typings'
 
 
-const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'register' | 'forgotPassword'> ) => {
+const Code = ({ loggedIn, codeRegister, serverErrors, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'login' | 'register' | 'forgotPassword'> ) => {
     const navigate = useNavigate()
     
     const [ found, setFound ] = useState(true)
     const [ startLoad, setStartLoad ] = useState(false)
+    const [ loading, setLoading ] = useState(false)
 
     const { url_param } = useParams()
 
@@ -30,6 +31,11 @@ const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: O
 
     const onSuccess = () => {
         navigate('/home')
+        setLoading(false)
+    }
+
+    const onFinish = () => {
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -52,15 +58,18 @@ const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: O
     const registerCompleteRequest = async (e: any) => {
         e.preventDefault()
 
-        verifyValidity()
-
         setError('fullError', '')
 
-        if(errors?.code?.length > 0) {
-            return;
-        }
+        if(verifyValidity()) return
 
-        codeRegister({ code: values.code, onSuccess })
+        try {
+            setLoading(true)
+
+            await codeRegister({ code: values.code, onSuccess, onFinish })
+        } catch (err) {
+            console.log(err)
+            setLoading(false)
+        }
     }
 
     if(!startLoad) return null
@@ -112,4 +121,4 @@ const Code = ({ loggedIn, loading, codeRegister, serverErrors, defaultState }: O
     )
 }
 
-export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, loading: state.auth.loading, serverErrors: state.auth.errors }), { codeRegister, defaultState })(Code);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors }), { codeRegister, defaultState })(Code);

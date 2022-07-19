@@ -70,6 +70,7 @@ const reducer: any = (state = INITIAL_STATE, action: any) => {
                 errors: {
                     email: '',
                     password: '',
+                    confirmPassword: '',
                     username: '',
                     fullError: '',
                     code: ''
@@ -98,7 +99,6 @@ const reducer: any = (state = INITIAL_STATE, action: any) => {
         case AUTH_ACTIONS.LOG_IN_SUCCESS: {
             return {
                 ...state,
-                loading: false,
                 loggedIn: true,
                 email: action.payload.result.email, 
                 userId: action.payload.result.id,
@@ -108,7 +108,6 @@ const reducer: any = (state = INITIAL_STATE, action: any) => {
         case AUTH_ACTIONS.REGISTER_FAIL: {
             return {
                 ...state,
-                loading: false,
                 loggedIn: false,
                 errors: {
                     [ action.payload.name ]: action.payload.error
@@ -124,7 +123,6 @@ const reducer: any = (state = INITIAL_STATE, action: any) => {
         case AUTH_ACTIONS.CODE_REGISTER_FAIL: {
             return {
                 ...state,
-                loading: false,
                 loggedIn: false,
                 errors: {
                     [ action.payload.name ]: action.payload.error
@@ -134,14 +132,15 @@ const reducer: any = (state = INITIAL_STATE, action: any) => {
         case AUTH_ACTIONS.CODE_REGISTER_SUCCESS: {
             return {
                 ...state,
-                loading: false,
-                loggedIn: true
+                loggedIn: true,
+                email: action.payload.email, 
+                userId: action.payload.id,
+                username: action.payload.name
             }
         }
         case AUTH_ACTIONS.FP_FAIL: {
             return {
                 ...state,
-                loading: false,
                 [ action.payload.name ]: action.payload.error
             }
         }

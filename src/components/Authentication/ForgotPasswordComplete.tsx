@@ -13,8 +13,9 @@ import { completeForgotPassword, defaultState } from '../../actions/authActions'
 import { AuthPropsReducer } from '@typings'
  
 
-const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgotPassword , defaultState }: Omit<AuthPropsReducer, 'register' | 'login' | 'codeRegister' | 'forgotPassword'> ) => {
+const ForgotPasswordComplete = ({ serverErrors, loggedIn, completeForgotPassword , defaultState }: Omit<AuthPropsReducer, 'register' | 'login' | 'codeRegister' | 'forgotPassword'> ) => {
     const navigate = useNavigate()
+    const [ loading, setLoading ] = useState(false)
 
     const [ startLoad, setStartLoad ] = useState(false)
     const [ check, setCheck ] = useState(true)
@@ -37,10 +38,16 @@ const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgo
 
     const onPageFail = () => {
         setCheck(false)
+        setLoading(false)
     }
 
     const onSuccess = () => {
         setSent(true)
+        setLoading(false)
+    }
+
+    const onFinish = () => {
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -67,11 +74,16 @@ const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgo
 
         setError('fullError', '')
 
-        verifyValidity()
+        if(verifyValidity()) return;
 
-        if(errors?.password?.length > 0 || errors?.confirmPassword?.length > 0) return;
+        try {
+            setLoading(true)
 
-        completeForgotPassword({ password: values.password, confirmPassword: values.confirmPassword, unique_url, onSuccess, onPageFail })
+            await completeForgotPassword({ password: values.password, confirmPassword: values.confirmPassword, unique_url, onSuccess, onPageFail, onFinish })
+        } catch (err) {
+            console.log(err)
+            setLoading(false)
+        }
     }
     
     if(!startLoad) return null;
@@ -175,4 +187,4 @@ const ForgotPasswordComplete = ({ serverErrors, loading, loggedIn, completeForgo
     )
 }
 
-export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors, loading: state.auth.loading }), { completeForgotPassword, defaultState })(ForgotPasswordComplete);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors }), { completeForgotPassword, defaultState })(ForgotPasswordComplete);

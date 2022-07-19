@@ -11,7 +11,6 @@ export type Section = 'Messages' | 'Social' | 'None'
 
 export interface AuthPropsReducer {
     loggedIn: boolean;
-    loading: boolean;
     serverErrors: { 
         email: string;
         password: string;
@@ -47,8 +46,8 @@ export interface FormHandler {
         both: string;
     }
     setField: (name: string, newValue: string) => void;
-    setError: (name: string, newValue: string) => void;
-    verifyValidity: () => void;
+    setError: (name: string | string[], newValue: string) => void;
+    verifyValidity: () => boolean;
 }
 
 export type initialValues = {

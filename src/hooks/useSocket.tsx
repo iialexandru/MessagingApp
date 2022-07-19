@@ -50,8 +50,8 @@ export const useSocketInit = () => {
         })
     }
     
-    const sendMessage = ({ text, date, conversationId, userId, files, id }: { id: number, text: string, date: string, conversationId: string, userId: string, files: string[] }) => {
-        socket.emit('send-message', { text, date, conversationId, userId, files, id })
+    const sendMessage = ({ text, date, conversationId, userId, files, id, time }: { time: string, id: number, text: string, date: string, conversationId: string, userId: string, files: string[] }) => {
+        socket.emit('send-message', { text, date, conversationId, userId, files, id, time })
     }
 
     const messageSeenByOther = ({ conversationId, seenEmail }: { conversationId: string, seenEmail: string }) => {

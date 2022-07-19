@@ -122,6 +122,8 @@ const Home = ({ loggedIn, username, email, userId, receiveMessage, _messages, la
         }
     }
 
+    console.log(conversations)
+
     return (
         <div className={styles.container}>
             <div className={styles.mess_container}>

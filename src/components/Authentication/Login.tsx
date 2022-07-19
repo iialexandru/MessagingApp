@@ -10,8 +10,10 @@ import useFormHandler from '../../hooks/useFormHandler'
 import { AuthPropsReducer } from '@typings'
 
 
-const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'register' | 'codeRegister' | 'forgotPassword'> ) => {
+const Login = ({ loggedIn, login, serverErrors, defaultState }: Omit<AuthPropsReducer, 'completeForgotPassword' | 'register' | 'codeRegister' | 'forgotPassword'> ) => {
     const navigate = useNavigate()
+    
+    const [ loading, setLoading ] = useState(false)
 
     const [ show, setShow ] = useState(false)
 
@@ -26,17 +28,26 @@ const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: Omit<Au
         navigate('/home')
     }
 
+    const onFinish  = () => {
+        setLoading(false)
+    }
+
 
     const loginRequest = async (e: any) => {
         e.preventDefault()
 
         setError('fullError', '')
-        
-        verifyValidity()
 
-        if(errors?.email?.length > 0 || errors?.password?.length > 0) return;
-        
-        login({ email: values.email, password: values.password, onSuccess })
+        if(verifyValidity()) return;
+
+        try {
+            setLoading(true)
+
+            await login({ email: values.email, password: values.password, onSuccess, onFinish })
+        } catch (err) {
+            console.log(err)
+            setLoading(false)
+        }
     }
     
     return (
@@ -50,7 +61,7 @@ const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: Omit<Au
                                 placeholder='example@gmail.com' 
                                 value={values.email} 
                                 autoComplete='email'
-                                onChange={e => { setField('email', e.target.value); setError('both', '') } } 
+                                onChange={e => { setField('email', e.target.value); setError([ 'email', 'both' ], '') } } 
                                 variant='standard'
                                 onKeyDown={e => { if(e.key === 'Enter') { loginRequest(e) } } } 
                                 helperText={errors.email}
@@ -70,7 +81,7 @@ const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: Omit<Au
                                 placeholder='123abc...' 
                                 value={values.password} 
                                 type={!show ? 'password' : 'text'}
-                                onChange={e => { setField('password', e.target.value); setError('both', '') } } 
+                                onChange={e => { setField('password', e.target.value); setError([ 'password', 'both' ], '') } } 
                                 variant='standard'
                                 autoComplete='password'
                                 onKeyDown={e => { if(e.key === 'Enter') { loginRequest(e) } } } 
@@ -115,4 +126,4 @@ const Login = ({ loggedIn, login, loading, serverErrors, defaultState }: Omit<Au
     )
 }
 
-export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors, loading: state.auth.loading }), { login, defaultState })(Login);
+export default connect((state: any) => ({ loggedIn: state.auth.loggedIn, serverErrors: state.auth.errors }), { login, defaultState })(Login);
